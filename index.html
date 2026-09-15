@@ -3,141 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <title>Generador Oficial CAVA</title>
-  <style>
-    /* Configuraciones para la pantalla */
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #e9ecef;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
-    .panel-control {
-      margin-bottom: 20px;
-    }
-    .btn {
-      background: #009246;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .btn:hover { background: #007a3a; }
-    
-    /* El contenedor principal */
-    .documento {
-      width: 210mm;
-      min-height: 297mm;
-      background: #ffffff;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      position: relative;
-      box-sizing: border-box;
-      padding-left: 12mm; 
-      /* Hacemos que el documento actúe como Flexbox para que el footer baje al final siempre */
-      display: flex;
-      flex-direction: column;
-    }
-    
-    /* Bandera lateral */
-    .bandera-lateral {
-      position: absolute;
-      top: 0; left: 0; bottom: 0;
-      width: 12mm;
-      display: flex;
-    }
-    .verde { width: 33.33%; background: #009246; }
-    .blanco { width: 33.34%; background: #f4f4f4; }
-    .rojo { width: 33.33%; background: #ce2b37; }
+  <link rel="icon" type="image/png" href="iconoweb.png">
 
-    .contenido {
-      padding: 15mm 20mm 15mm 15mm;
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1; /* Ocupa todo el espacio de la hoja A4 */
-      box-sizing: border-box;
-    }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    .header {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      gap: 25px;
-      border-bottom: 2px solid #f0f0f0;
-      padding-bottom: 15px;
-    }
-    .header img {
-      max-height: 85px;
-      max-width: 130px;
-      object-fit: contain;
-    }
-    .header h1 { margin: 0; font-size: 26px; color: #009246; letter-spacing: 0.5px; }
-    .header h1 span { color: #ce2b37; font-weight: 800; }
-    .header p { margin: 4px 0 0 0; font-size: 11px; color: #666; letter-spacing: 1px;}
-    
-    .cuerpo {
-      margin: 30px 0;
-      flex-grow: 1;
-      outline: none;
-    }
-    .cuerpo p { line-height: 1.6; margin-bottom: 10px; }
-    
-    .footer {
-      font-size: 10px;
-      color: #777;
-      border-top: 1px solid #eee;
-      padding-top: 15px;
-      line-height: 1.6;
-      margin-top: auto; /* Magia: siempre lo empuja clavado al fondo */
-      user-select: none;
-    }
-    .footer b { color: #555; }
-    
-    /* Enlaces interactivos que parecen texto formal */
-    a.link-limpio {
-      color: inherit;
-      text-decoration: none;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-    /* Solo cambian levemente de color al pasar el mouse en la web para indicar que son clicleables */
-    a.link-limpio:hover {
-      color: #009246;
-    }
-    
-    /* EXPORTACIÓN A PDF */
-    @media print {
-      @page { size: A4; margin: 0; }
-      body { background: none; padding: 0; display: block; }
-      .panel-control { display: none; }
-      .documento { box-shadow: none; width: 100%; min-height: auto; padding-left: 0; display: block; }
-      .bandera-lateral { position: fixed; height: 100vh; }
-      .contenido { padding-left: 27mm; padding-right: 20mm; padding-top: 15mm; padding-bottom: 20mm; display: block; }
-      p, h1, h2, h3 { page-break-inside: avoid; }
-      /* Al imprimir bloqueamos el hover */
-      a.link-limpio { color: inherit !important; text-decoration: none !important; }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="panel-control">
-    <button class="btn" onclick="window.print()">🖨️ Exportar a PDF / Imprimir</button>
-  </div>
+  <div class="app-shell" id="app-shell">
 
-  <div class="documento">
-    <div class="bandera-lateral">
-      <div class="verde"></div><div class="blanco"></div><div class="rojo"></div>
+    <!-- IZQUIERDA: SELECTOR DE DOCUMENTO -->
+    <div class="sidebar">
+      <div class="sidebar-brand">
+        <img src="iconoweb.png" alt="CAVA">
+        <h2 class="sidebar-brand-title">Portal <span>CAVA</span></h2>
+      </div>
+      <div class="sidebar-seccion-titulo">Documentos</div>
+      <button class="sidebar-btn activo" data-vista="comunicados" onclick="mostrarVista('comunicados', this)">📄 Comunicados A4</button>
+      <button class="sidebar-btn" data-vista="tarjetas" onclick="mostrarVista('tarjetas', this)">🪪 Tarjetas Personales</button>
+      <button class="sidebar-btn ayuda" onclick="abrirAyuda()">🛟 ¿Cómo funciona esto?</button>
     </div>
 
-    <div class="contenido">
+    <!-- CENTRO: LA HOJA A4 O LA VISTA PREVIA DE TARJETAS -->
+    <div class="main-panel">
+
+      <!-- VISTA: COMUNICADOS A4 -->
+      <div id="vista-comunicados" class="vista activa">
+
+        <div class="documento" id="documento-a4">
+          <div class="bandera-lateral">
+            <div class="verde"></div><div class="blanco"></div><div class="rojo"></div>
+          </div>
+
+          <div class="contenido">
       <div class="header">
         <img src="https://PEGAR-AQUI-EL-LINK-AL-LOGO.png" alt="Logo CAVA">
         <div>
@@ -161,16 +62,182 @@
         <a class="link-limpio" href="https://maps.google.com/?q=Diputado+Nacional+Osvaldo+E.+Benedetti+195,+CABA,+Argentina" target="_blank" title="Abrir en Google Maps">
           📍 Dip. Nac. Osvaldo E. Benedetti, 195 – (C1407JUC) CABA – ARGENTINA
         </a><br>
-        📞 <b>Tel:</b> 
-        <a class="link-limpio" href="https://wa.me/5492615338834" target="_blank" title="Enviar WhatsApp a +54 9 261 5338834">+54 9 261 5338834</a> / 
-        <a class="link-limpio" href="https://wa.me/5493512146193" target="_blank" title="Enviar WhatsApp a +54 9 351 2146193">+54 9 351 2146193</a> | 
+        📞 <b>Tel:</b>
+        <a class="link-limpio" href="https://wa.me/5492615338834" target="_blank" title="Enviar WhatsApp a +54 9 261 5338834">+54 9 261 5338834</a> /
+        <a class="link-limpio" href="https://wa.me/5493512146193" target="_blank" title="Enviar WhatsApp a +54 9 351 2146193">+54 9 351 2146193</a> |
         ✉️ <b>Email:</b> <a class="link-limpio" href="mailto:federazionecava@gmail.com">federazionecava@gmail.com</a><br>
-        🌐 <b>Web:</b> <a class="link-limpio" href="https://federazionecava.org" target="_blank">federazionecava.org</a> | 
-        📱 <b>FB:</b> <a class="link-limpio" href="https://www.facebook.com/cava.comitatovenetoargentina" target="_blank">cava.comitatovenetoargentina</a> | 
+        🌐 <b>Web:</b> <a class="link-limpio" href="https://federazionecava.org" target="_blank">federazionecava.org</a> |
+        📱 <b>FB:</b> <a class="link-limpio" href="https://www.facebook.com/cava.comitatovenetoargentina" target="_blank">cava.comitatovenetoargentina</a> |
         📷 <b>IG:</b> <a class="link-limpio" href="https://www.instagram.com/federazionecava/" target="_blank">@federazionecava</a>
       </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA: TARJETAS PERSONALES -->
+      <div id="vista-tarjetas" class="vista">
+        <div class="tarjetas-preview" id="tarjetas-preview">
+          <div class="tarjeta tarjeta-frente" id="tarjeta-frente">
+            <img src="https://PEGAR-AQUI-EL-LINK-AL-LOGO.png" alt="Logo CAVA">
+            <h2>FEDERAZIONE <span>CAVA</span></h2>
+          </div>
+          <div class="tarjeta tarjeta-dorso" id="tarjeta-dorso">
+            <img class="qr" src="https://PEGAR-AQUI-EL-LINK-AL-QR.png" alt="Código QR">
+            <div class="datos">
+              <b id="tj-out-nombre">Nombre Apellido</b>
+              <span id="tj-out-cargo">Cargo</span><br>
+              <span id="tj-out-celular">Celular</span><br>
+              <span class="email">federazionecava@gmail.com</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- DERECHA: HERRAMIENTAS (Comunicados) o FORMULARIO (Tarjetas), según la vista activa -->
+    <div class="panel-derecho">
+
+      <div class="panel-derecho-seccion activa" id="seccion-herramientas">
+        <h3 class="panel-derecho-titulo">Formato de texto</h3>
+
+        <div class="grupo-titulo">Formato</div>
+        <div class="grid-herramientas">
+          <div class="toolbar-celda">
+            <button class="icono" onclick="formatoTexto('bold')" title="Poner en negrita"><b>N</b></button>
+            <span class="etiqueta">Negrita</span>
+          </div>
+          <div class="toolbar-celda">
+            <button class="icono" onclick="formatoTexto('italic')" title="Poner en cursiva"><i>C</i></button>
+            <span class="etiqueta">Cursiva</span>
+          </div>
+          <div class="toolbar-celda">
+            <button class="icono" onclick="formatoTexto('underline')" title="Subrayar el texto"><u>S</u></button>
+            <span class="etiqueta">Subrayar</span>
+          </div>
+          <div class="toolbar-celda">
+            <button class="icono" onclick="formatoTexto('strikeThrough')" title="Tachar el texto"><s>T</s></button>
+            <span class="etiqueta">Tachar</span>
+          </div>
+        </div>
+
+        <div class="separador-punteado"></div>
+        <div class="grupo-titulo">Listas y alineación</div>
+        <div class="grid-herramientas">
+          <div class="toolbar-celda">
+            <button class="icono" onclick="formatoTexto('insertUnorderedList')" title="Lista con viñetas">•≡</button>
+            <span class="etiqueta">Viñetas</span>
+          </div>
+          <div class="toolbar-celda">
+            <button class="icono" onclick="formatoTexto('insertOrderedList')" title="Lista numerada">1.≡</button>
+            <span class="etiqueta">Numerada</span>
+          </div>
+          <div></div>
+          <div class="toolbar-celda">
+            <button class="icono" onclick="formatoTexto('justifyLeft')" title="Alinear a la izquierda">⇤</button>
+            <span class="etiqueta">Izquierda</span>
+          </div>
+          <div class="toolbar-celda">
+            <button class="icono" onclick="formatoTexto('justifyCenter')" title="Centrar el texto">⇔</button>
+            <span class="etiqueta">Centro</span>
+          </div>
+          <div class="toolbar-celda">
+            <button class="icono" onclick="formatoTexto('justifyRight')" title="Alinear a la derecha">⇥</button>
+            <span class="etiqueta">Derecha</span>
+          </div>
+        </div>
+
+        <div class="separador-punteado"></div>
+        <div class="grupo-titulo">Color y tamaño</div>
+        <div class="grid-herramientas">
+          <div class="toolbar-celda">
+            <input type="color" value="#009246" oninput="formatoTexto('foreColor', this.value)" title="Color de letra">
+            <span class="etiqueta">Letra</span>
+          </div>
+          <div class="toolbar-celda">
+            <input type="color" value="#fff176" oninput="resaltarTexto(this.value)" title="Color de resaltado">
+            <span class="etiqueta">Marcador</span>
+          </div>
+          <div></div>
+          <div class="toolbar-celda">
+            <button class="icono" onclick="ajustarTamano(-1)" title="Achicar la letra">A−</button>
+            <span class="etiqueta">Achicar</span>
+          </div>
+          <div class="toolbar-celda">
+            <button class="icono" onclick="ajustarTamano(1)" title="Agrandar la letra">A+</button>
+            <span class="etiqueta">Agrandar</span>
+          </div>
+        </div>
+
+        <div class="separador-punteado"></div>
+        <div class="grupo-titulo">Historial</div>
+        <div class="grid-herramientas">
+          <div class="toolbar-celda">
+            <button class="icono" onclick="formatoTexto('undo')" title="Deshacer">↶</button>
+            <span class="etiqueta">Deshacer</span>
+          </div>
+          <div class="toolbar-celda">
+            <button class="icono" onclick="formatoTexto('redo')" title="Rehacer">↷</button>
+            <span class="etiqueta">Rehacer</span>
+          </div>
+        </div>
+
+        <button class="btn" onclick="descargarComunicadoPDF()">⬇️ Descargar PDF</button>
+      </div>
+
+      <div class="panel-derecho-seccion" id="seccion-tarjeta">
+        <h3 class="panel-derecho-titulo">Datos de tu tarjeta</h3>
+        <label>Nombre y Apellido
+          <input type="text" id="tj-nombre" placeholder="Juan Pérez" oninput="actualizarTarjeta()">
+        </label>
+        <label>Cargo
+          <input type="text" id="tj-cargo" placeholder="Secretario" oninput="actualizarTarjeta()">
+        </label>
+        <label>Celular
+          <input type="text" id="tj-celular" placeholder="+54 9 ..." oninput="actualizarTarjeta()">
+        </label>
+        <div class="acciones">
+          <button class="btn" onclick="descargarTarjetasPDF()">⬇️ Descargar PDF</button>
+          <button class="btn btn-secundario" onclick="descargarTarjetasPNG()">🖼️ Descargar Imagen</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MODAL DE AYUDA -->
+  <div id="modal-ayuda" class="modal-overlay" onclick="if (event.target === this) cerrarAyuda()">
+    <div class="modal-caja">
+      <button class="modal-cerrar" onclick="cerrarAyuda()" aria-label="Cerrar">✕</button>
+      <h2 class="modal-titulo">🛟 ¿Cómo funciona esto?</h2>
+
+      <p>El <b>Portal CAVA</b> sirve para armar dos cosas oficiales de la Federazione, sin instalar nada ni usar Word: <b>comunicados</b> en hoja A4 membretada y <b>tarjetas personales</b> con QR. Todo se descarga listo para imprimir con un solo botón.</p>
+
+      <h3 class="modal-subtitulo">📄 Comunicados A4</h3>
+      <ul>
+        <li>Elegí <b>"Comunicados A4"</b> en el menú de la izquierda.</li>
+        <li>Escribí tu texto directamente sobre la hoja blanca, donde dice "Escribe aquí tu comunicado...".</li>
+        <li>Para darle formato, seleccioná el texto que escribiste y usá los botones del <b>panel de la derecha</b>: negrita, cursiva, subrayado, tachado, viñetas, listas numeradas, alineación, color de letra, marcador y tamaño de letra.</li>
+        <li>Los datos del pie de página (dirección, WhatsApp, mail, redes) ya están cargados y son clickeables — no hace falta tocarlos.</li>
+        <li>Cuando termines, tocá el botón verde <b>"Descargar PDF"</b>: te baja el archivo ya listo para imprimir, en una sola hoja.</li>
+      </ul>
+
+      <h3 class="modal-subtitulo">🪪 Tarjetas Personales</h3>
+      <ul>
+        <li>Elegí <b>"Tarjetas Personales"</b> en el menú de la izquierda.</li>
+        <li>Completá <b>Nombre, Cargo y Celular</b> en el panel de la derecha: se van actualizando solos en el dorso de la tarjeta, a medida que escribís.</li>
+        <li>El frente (logo y nombre institucional) y el mail de contacto del dorso son fijos, no se editan.</li>
+        <li>Descargala con <b>"Descargar PDF"</b> (el frente y el dorso, cada uno en una hoja de 90x50mm, lista para imprimir) o con <b>"Descargar Imagen"</b> (un PNG con las dos caras juntas).</li>
+      </ul>
+
+      <p>Podés volver a abrir esta ayuda cuando quieras con el botón "¿Cómo funciona esto?" del menú. 🇮🇹</p>
     </div>
   </div>
-  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="script.js"></script>
+
 </body>
 </html>
