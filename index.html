@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generador Oficial CAVA</title>
+  <style>
+    /* Configuraciones para la pantalla */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #e9ecef;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .panel-control {
+      margin-bottom: 20px;
+    }
+    .btn {
+      background: #009246;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn:hover { background: #007a3a; }
+    
+    /* El contenedor principal */
+    .documento {
+      width: 210mm;
+      min-height: 297mm;
+      background: #ffffff;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      position: relative;
+      box-sizing: border-box;
+      padding-left: 12mm; 
+      /* Hacemos que el documento actúe como Flexbox para que el footer baje al final siempre */
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Bandera lateral */
+    .bandera-lateral {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 12mm;
+      display: flex;
+    }
+    .verde { width: 33.33%; background: #009246; }
+    .blanco { width: 33.34%; background: #f4f4f4; }
+    .rojo { width: 33.33%; background: #ce2b37; }
+
+    .contenido {
+      padding: 15mm 20mm 15mm 15mm;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1; /* Ocupa todo el espacio de la hoja A4 */
+      box-sizing: border-box;
+    }
+
+    .header {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 25px;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 15px;
+    }
+    .header img {
+      max-height: 85px;
+      max-width: 130px;
+      object-fit: contain;
+    }
+    .header h1 { margin: 0; font-size: 26px; color: #009246; letter-spacing: 0.5px; }
+    .header h1 span { color: #ce2b37; font-weight: 800; }
+    .header p { margin: 4px 0 0 0; font-size: 11px; color: #666; letter-spacing: 1px;}
+    
+    .cuerpo {
+      margin: 30px 0;
+      flex-grow: 1;
+      outline: none;
+    }
+    .cuerpo p { line-height: 1.6; margin-bottom: 10px; }
+    
+    .footer {
+      font-size: 10px;
+      color: #777;
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+      line-height: 1.6;
+      margin-top: auto; /* Magia: siempre lo empuja clavado al fondo */
+      user-select: none;
+    }
+    .footer b { color: #555; }
+    
+    /* Enlaces interactivos que parecen texto formal */
+    a.link-limpio {
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    /* Solo cambian levemente de color al pasar el mouse en la web para indicar que son clicleables */
+    a.link-limpio:hover {
+      color: #009246;
+    }
+    
+    /* EXPORTACIÓN A PDF */
+    @media print {
+      @page { size: A4; margin: 0; }
+      body { background: none; padding: 0; display: block; }
+      .panel-control { display: none; }
+      .documento { box-shadow: none; width: 100%; min-height: auto; padding-left: 0; display: block; }
+      .bandera-lateral { position: fixed; height: 100vh; }
+      .contenido { padding-left: 27mm; padding-right: 20mm; padding-top: 15mm; padding-bottom: 20mm; display: block; }
+      p, h1, h2, h3 { page-break-inside: avoid; }
+      /* Al imprimir bloqueamos el hover */
+      a.link-limpio { color: inherit !important; text-decoration: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="panel-control">
+    <button class="btn" onclick="window.print()">🖨️ Exportar a PDF / Imprimir</button>
+  </div>
+
+  <div class="documento">
+    <div class="bandera-lateral">
+      <div class="verde"></div><div class="blanco"></div><div class="rojo"></div>
+    </div>
+
+    <div class="contenido">
+      <div class="header">
+        <img src="https://PEGAR-AQUI-EL-LINK-AL-LOGO.png" alt="Logo CAVA">
+        <div>
+          <h1>FEDERAZIONE <span>CAVA</span></h1>
+          <p>COMITATO ASSOCIAZIONI VENETE ARGENTINA</p>
+        </div>
+      </div>
+
+      <div class="cuerpo" contenteditable="true">
+        <p style="text-align: right; color: #888;">Buenos Aires, [Fecha]</p>
+        <p style="color: #009246;"><strong>Ref:</strong> [Asunto]</p>
+        <br>
+        <p>Estimados/as,</p>
+        <p>Escribe aquí tu comunicado. Ahora el footer está 100% clavado al fondo de la hoja, aunque escribas solo dos renglones. Además, los enlaces de Whatsapp y Maps están activos y funcionan perfecto con un clic.</p>
+        <br><br>
+        <p style="text-align: center;">___________________________<br><b>Firma Institucional</b></p>
+      </div>
+
+      <!-- FOOTER CLAVADO Y CLIQUEABLE -->
+      <div class="footer">
+        <a class="link-limpio" href="https://maps.google.com/?q=Diputado+Nacional+Osvaldo+E.+Benedetti+195,+CABA,+Argentina" target="_blank" title="Abrir en Google Maps">
+          📍 Dip. Nac. Osvaldo E. Benedetti, 195 – (C1407JUC) CABA – ARGENTINA
+        </a><br>
+        📞 <b>Tel:</b> 
+        <a class="link-limpio" href="https://wa.me/5492615338834" target="_blank" title="Enviar WhatsApp a +54 9 261 5338834">+54 9 261 5338834</a> / 
+        <a class="link-limpio" href="https://wa.me/5493512146193" target="_blank" title="Enviar WhatsApp a +54 9 351 2146193">+54 9 351 2146193</a> | 
+        ✉️ <b>Email:</b> <a class="link-limpio" href="mailto:federazionecava@gmail.com">federazionecava@gmail.com</a><br>
+        🌐 <b>Web:</b> <a class="link-limpio" href="https://federazionecava.org" target="_blank">federazionecava.org</a> | 
+        📱 <b>FB:</b> <a class="link-limpio" href="https://www.facebook.com/cava.comitatovenetoargentina" target="_blank">cava.comitatovenetoargentina</a> | 
+        📷 <b>IG:</b> <a class="link-limpio" href="https://www.instagram.com/federazionecava/" target="_blank">@federazionecava</a>
+      </div>
+    </div>
+  </div>
+  
+</body>
+</html>
