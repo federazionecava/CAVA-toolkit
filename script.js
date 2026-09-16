@@ -36,6 +36,21 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarAyud
 
 async function descargarComunicadoPDF() {
   const el = document.getElementById('documento-a4');
+
+  // Guardamos dónde está cada link ANTES de rasterizar, como % del tamaño de la hoja,
+  // para poder dibujar encima de la imagen final un área cliqueable real en el PDF.
+  const elRect = el.getBoundingClientRect();
+  const links = Array.from(el.querySelectorAll('a[href]')).map(a => {
+    const r = a.getBoundingClientRect();
+    return {
+      href: a.href,
+      xRatio: (r.left - elRect.left) / elRect.width,
+      yRatio: (r.top - elRect.top) / elRect.height,
+      wRatio: r.width / elRect.width,
+      hRatio: r.height / elRect.height,
+    };
+  });
+
   const canvas = await html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
@@ -44,19 +59,33 @@ async function descargarComunicadoPDF() {
   const imgData = canvas.toDataURL('image/jpeg', 0.98);
   const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
+  // Agrega, sobre la página actual, un área cliqueable real por cada link cuyo rectángulo
+  // caiga (aunque sea parcialmente) dentro de esta hoja.
+  const agregarLinksEnPagina = (yOffsetMm) => {
+    links.forEach(l => {
+      const y = yOffsetMm + l.yRatio * imgHeight;
+      const h = l.hRatio * imgHeight;
+      if (y + h < 0 || y > pageHeight) return;
+      pdf.link(l.xRatio * pageWidth, y, l.wRatio * pageWidth, h, { url: l.href });
+    });
+  };
+
   if (imgHeight <= pageHeight + 1) {
     // Entra en una sola hoja: la estiramos exacto a 297mm para que NUNCA se genere una 2da página en blanco
     pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+    agregarLinksEnPagina(0);
   } else {
     // Comunicado largo: paginamos a mano, sin dejar páginas casi vacías al final
     let heightLeft = imgHeight;
     let position = 0;
     pdf.addImage(imgData, 'JPEG', 0, position, pageWidth, imgHeight);
+    agregarLinksEnPagina(position);
     heightLeft -= pageHeight;
     while (heightLeft > 0.5) {
       position -= pageHeight;
       pdf.addPage();
       pdf.addImage(imgData, 'JPEG', 0, position, pageWidth, imgHeight);
+      agregarLinksEnPagina(position);
       heightLeft -= pageHeight;
     }
   }

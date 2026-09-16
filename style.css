@@ -242,7 +242,7 @@ a.link-limpio:hover {
   border-bottom: 1px dashed var(--border-soft);
   margin-bottom: 8px;
 }
-.sidebar-brand img { width: 34px; height: 34px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.sidebar-brand img { width: 34px; height: 34px; object-fit: contain; }
 .sidebar-brand-title {
   font-size: 15px;
   font-weight: 800;
