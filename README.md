@@ -60,7 +60,16 @@ una segunda hoja casi en blanco por errores de redondeo en su paginado automáti
 
 No reintroduzcas `html2pdf.js` para esto sin volver a probar ese caso límite.
 
-Se probó en su momento cambiar esto por `window.print()` (impresión nativa del navegador) para que
+El PDF que arma `html2canvas` es, en el fondo, una imagen — no tiene texto seleccionable. Para que
+los links del footer (Whatsapp, mail, mapa, web, Instagram) igual queden cliqueables arriba de esa
+imagen, `descargarComunicadoPDF()` mide con `getBoundingClientRect()` la posición de cada `<a>`
+DENTRO de `#documento-a4` **antes** de rasterizar, la guarda como % del ancho/alto de la hoja, y
+después de pegar la imagen le agrega encima esos rectángulos como links reales con `pdf.link()`.
+Si cambiás el layout del footer (o agregás/sacás links), no hay que tocar nada de esto — se recalcula
+solo porque mide el DOM en cada exportación. Si el comunicado pagina a varias hojas, cada link se
+agrega solo en la página donde su rectángulo realmente cae.
+
+Se probó en su momento cambiar todo esto por `window.print()` (impresión nativa del navegador) para que
 el PDF saliera con texto seleccionable y links cliqueables. Se volvió atrás: en la práctica el logo
 y la franja de bandera no salían en la impresión real (aunque en capturas automatizadas sí), y de
 paso cambiaba la descarga de un click a tener que pasar por el diálogo de impresión — dos motivos
