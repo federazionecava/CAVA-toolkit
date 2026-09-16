@@ -39,10 +39,11 @@ js/
 
 img/         → todas las imágenes de la app:
               - logo.png, bandera.svg → arte del membrete del comunicado (logo y franja de
-                bandera) y favicon de la web (`<link rel="icon">` apunta a img/logo.png)
+                bandera), usados también en el sidebar y las tarjetas
+              - iconoweb.png → favicon de la web (`<link rel="icon">` apunta a img/iconoweb.png).
+                Hubo una vuelta donde se probó `logo.png` como favicon y se volvió atrás — la
+                Federazione prefiere la banderita redonda para la pestaña del navegador.
               - qr.png → QR fijo del dorso de la Tarjeta Personal
-              - iconoweb.png → banderita redonda, ya no se usa como favicon (ver logo.png);
-                sigue en la carpeta sin uso por si hace falta más adelante
               - logo_doc.svg → NO está referenciado en ningún lado del código (ni index.html, ni
                 css/, ni js/) — quedó ahí de alguna iteración anterior; antes de borrarlo,
                 confirmar con el usuario que de verdad no hace falta
@@ -64,15 +65,19 @@ ZT Nature/   → paquete completo de la tipografía (formatos OT/TT/Variable/WEB
 ```
 
 No hay `package.json`, ni bundler, ni dependencias locales. Las únicas dependencias externas son
-dos `<script>` por CDN (cdnjs), cargados en `index.html` antes de los scripts propios de `js/`:
+tres `<script>` por CDN (cdnjs), cargados en `index.html` antes de los scripts propios de `js/`:
 
 - `html2canvas` — todavía se usa para las Tarjetas Personales (`descargarTarjetasPDF`/`PNG` en
   `js/script.js`), que son básicamente una imagen (logo + QR + datos), no un documento de texto.
 - `jspdf` (UMD) — arma los PDF de comunicado y tarjetas.
+- `libphonenumber-js` (bundle minificado, expone el global `libphonenumber`) — formatea en vivo el
+  campo Celular de la Tarjeta Personal a medida que se escribe (`AsYouType`, ver decisión de
+  diseño #7 más abajo).
 
 No se usa Google Fonts: toda la tipografía (interfaz y documento) es `ZT Nature`, self-hosted.
 
-Si esto se despliega sin internet, hay que vendorizar esos dos scripts (jsPDF y html2canvas).
+Si esto se despliega sin internet, hay que vendorizar estos tres scripts (jsPDF, html2canvas y
+libphonenumber-js).
 
 ## Decisiones de diseño que no son obvias mirando el código
 
@@ -109,9 +114,12 @@ Cómo funciona ahora (todo en `pdf-comunicado.js`):
 - Los links del footer (`<a href>`) se detectan con `el.closest('a[href]')` en cada run de texto y
   se agregan como `pdf.link()` real, en la posición exacta donde se dibujó ese texto — no hay
   estimación por porcentaje del tamaño de la hoja como en la versión vieja.
-- Los emojis del footer (📍📞✉️🌐📱) se descartan antes de dibujar (regex de
-  `Extended_Pictographic`): la fuente ZT Nature no trae esos glifos y jsPDF no rendriza emoji a
-  color. Las etiquetas en negrita (Tel:/Email:/Web:/Instagram:) ya alcanzan sin el ícono.
+- Cualquier emoji se descarta antes de dibujar (regex de `Extended_Pictographic`): la fuente ZT
+  Nature no trae esos glifos y jsPDF no renderiza emoji a color. El footer (📍📞✉️🌐📱 originalmente)
+  ya no tiene emojis directamente en el HTML — se sacaron a propósito para que la previsualización
+  en pantalla se vea igual que el PDF final, ver decisión de diseño más abajo — así que esta regex
+  ahora solo importa como red de seguridad si alguien pega un emoji en el cuerpo del comunicado
+  (el `contenteditable`), donde sí puede aparecer texto arbitrario.
 - La tipografía ZT Nature (Regular/Bold/Italic/BoldItalic) se incrusta en el PDF vía
   `pdf.addFileToVFS()` + `pdf.addFont()`, usando los base64 de `js/fonts-zt-nature.js`. Están
   embebidos como constante en vez de cargados con `fetch()` a unos `.ttf` en `fonts/` porque la
@@ -189,6 +197,43 @@ overflow.
 `@media (max-width: 1250px)`. El proyecto es explícitamente "desktop first": no está pensado para
 celular/tablet, solo para que no se rompa entre distintas resoluciones de PC/notebook.
 
+### 7. El campo Celular de la Tarjeta se formatea con una instancia nueva de `AsYouType` en cada tecleo
+
+El input `#tj-celular` ya NO tiene `oninput="actualizarTarjeta()"` en el HTML — ese listener se
+movió a `js/script.js` con `addEventListener('input', ...)`, a propósito, para que el orden de
+ejecución quede garantizado: primero se reformatea el valor con
+`new libphonenumber.AsYouType('AR').input(valor)` y recién después se llama a
+`actualizarTarjeta()` para refrescar la vista previa. Si alguna vez se vuelve a poner
+`oninput="actualizarTarjeta()"` en el HTML de ese input puntual, el handler inline se dispara
+ANTES que el de `addEventListener` (se registra primero, al parsear el HTML) y la vista previa
+queda un tecleo atrasada respecto del valor ya formateado.
+
+Se crea una instancia de `AsYouType` **nueva en cada tecleo** (no una persistente reutilizada)
+adrede: como siempre se le pasa el valor completo actual del input (no char por char), una
+instancia nueva reformatea todo desde cero — así backspace, borrado en el medio y pegado de texto
+funcionan bien sin arrastrar estado de tecleos anteriores. Si el usuario escribe un `+` seguido de
+otro código de país (ej. `+39` para Italia), `AsYouType` lo detecta solo a partir de los dígitos
+y reformatea con ese país en vez de Argentina — no hay lógica propia de detección de país, es
+built-in de la librería.
+
+### 8. El footer del comunicado no tiene emojis en el HTML, a propósito
+
+`index.html` tenía 📍📞✉️🌐📱 hardcodeados en `.footer-texto` (dirección, WhatsApp, email, web,
+Instagram). Se sacaron directamente del HTML — no hay ningún script/listener limpiándolos en
+tiempo de ejecución para esto puntual. El motivo: `pdf-comunicado.js` ya los descartaba al generar
+el PDF (ver punto 1, la fuente ZT Nature no trae esos glifos), así que con los emojis todavía en
+el HTML la previsualización en pantalla mostraba algo distinto de lo que salía en el PDF
+descargado. Si en algún momento alguien quiere "decorar" el footer de nuevo, que sea con algo que
+ZT Nature sepa dibujar (o con SVG inline, como los íconos de la toolbar), no con emoji — si no,
+vuelve a haber esa diferencia entre pantalla y PDF.
+
+### 9. El fondo de la app es gris, no blanco, a propósito
+
+`body` en `css/style.css` no es blanco puro: es un gris apenas más oscuro que el de la hoja A4 y
+las tarjetas, con el único fin de que el área de trabajo (la hoja, las tarjetas) resalte por
+contraste contra el fondo de la ventana. Si algún día "corregís" esto a blanco liso porque parece
+un descuido, estás sacando ese contraste a propósito buscado.
+
 ## Pendientes / cosas a resolver con el cliente
 
 - **Bug conocido: Tarjetas Personales rota bajo `file://`.** `descargarTarjetasPDF()` y
@@ -203,3 +248,9 @@ celular/tablet, solo para que no se rompa entre distintas resoluciones de PC/not
   `css/style.css`, ni en ningún archivo de `js/`. Puede ser un archivo de una iteración vieja del
   diseño que quedó dando vueltas — confirmar con el cliente si todavía hace falta antes de
   borrarlo (no se borró por las dudas).
+- **Falta subir `img/loading.png`.** Las meta tags Open Graph/Twitter Card del `<head>` (para que
+  WhatsApp y redes muestren una miniatura al compartir el link) ya apuntan a
+  `https://cava-toolkit.vercel.app/img/loading.png`, pero ese archivo todavía no existe en el
+  repo — lo tiene que subir el cliente a `img/`. Medida recomendada: 1200×630px. Si el dominio de
+  despliegue cambia de `cava-toolkit.vercel.app`, hay que actualizar las URLs absolutas de
+  `og:url`, `og:image` y `twitter:image` en `index.html` (ver el comentario ahí mismo).

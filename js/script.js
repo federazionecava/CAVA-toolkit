@@ -43,6 +43,17 @@ function actualizarTarjeta() {
   document.getElementById('tj-out-celular').textContent = document.getElementById('tj-celular').value || 'Celular';
 }
 
+// Formatea el celular en tiempo real a medida que se escribe (código de país variable:
+// en Argentina el código de área va de 2 a 4 dígitos). Si el usuario escribe un "+" con
+// otro código de país (ej: +39 para Italia), AsYouType lo detecta solo y reformatea con
+// ese país en vez de Argentina. Se crea un formateador nuevo en cada tecleo (en vez de uno
+// persistente) para que funcione bien con backspace/borrado/pegado: siempre reformatea
+// desde cero a partir del valor actual del input, no arrastra estado de tecleos previos.
+document.getElementById('tj-celular').addEventListener('input', (e) => {
+  e.target.value = new libphonenumber.AsYouType('AR').input(e.target.value);
+  actualizarTarjeta();
+});
+
 async function capturarTarjetas() {
   const opciones = { scale: 4, useCORS: true, backgroundColor: '#ffffff' };
   const frente = await html2canvas(document.getElementById('tarjeta-frente'), opciones);
