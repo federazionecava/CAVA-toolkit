@@ -1,4 +1,22 @@
 /* ============================================================
+   FUENTE DE MARCA (documentos oficiales)
+   ============================================================ */
+@font-face {
+  font-family: 'ZT Nature';
+  src: url('fonts/ZTNature-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ZT Nature';
+  src: url('fonts/ZTNature-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================
    VARIABLES Y BASE
    ============================================================ */
 :root {
@@ -61,7 +79,7 @@ body {
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   position: relative;
   box-sizing: border-box;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: 'ZT Nature', 'Segoe UI', system-ui, sans-serif;
   /* Hacemos que el documento actúe como Flexbox para que el footer baje al final siempre */
   display: flex;
   flex-direction: column;
@@ -147,7 +165,11 @@ a.link-limpio:hover {
   @page { size: A4; margin: 0; }
   html, body { height: 297mm; }
   body { background: none; padding: 0; display: block; }
-  .app-shell, .sidebar, .panel-derecho, #vista-tarjetas, .modal-overlay { display: none !important; }
+  /* OJO: acá NO se puede meter ".app-shell" a "display:none" — es el padre de ".documento"
+     y lo taparía a él también, dejando la impresión en blanco. Solo se ocultan sus hijos. */
+  .sidebar, .panel-derecho, #vista-tarjetas, .modal-overlay { display: none !important; }
+  .app-shell { display: block; width: auto; height: auto; }
+  .main-panel { display: block; height: auto; overflow: visible; padding: 0; }
   /* La hoja queda clavada a EXACTAMENTE 297mm y con overflow oculto: cualquier redondeo de píxeles
      de más se recorta acá adentro en vez de "empujar" una segunda hoja casi en blanco. */
   .documento {
@@ -168,7 +190,7 @@ a.link-limpio:hover {
     overflow: hidden;
   }
   p, h1, h2, h3 { page-break-inside: avoid; }
-  /* Al imprimir bloqueamos el hover */
+  /* Al imprimir bloqueamos el hover, pero el link en sí queda activo (real <a href>) */
   a.link-limpio { color: inherit !important; text-decoration: none !important; }
 }
 

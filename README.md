@@ -23,6 +23,11 @@ index.html   → estructura de la página (sidebar, hoja, tarjetas, panel derech
 style.css    → todo el CSS
 script.js    → toda la lógica JS (sin frameworks, DOM API + execCommand)
 iconoweb.png → favicon / logo redondo del sidebar
+logo.png, bandera.svg → arte del membrete del comunicado (logo y franja de bandera)
+fonts/       → ZTNature-Regular.woff2 y ZTNature-Bold.woff2, la tipografía oficial del comunicado
+              (cargada vía @font-face en style.css; el resto de los pesos de la fuente están
+              sin usar en la carpeta "ZT Nature/" en la raíz — es material de referencia, no se
+              sirve a la web)
 inpiracion.jpg, error.png → capturas de referencia de diseño usadas durante el desarrollo
               (no las borres sin preguntar; no son necesarias para que la web funcione)
 ```
@@ -32,8 +37,9 @@ tres `<script>` por CDN (cdnjs), cargados en `index.html` antes de `script.js`:
 
 - `html2canvas` — rasteriza el DOM a un `<canvas>`.
 - `jspdf` (UMD) — arma el PDF a partir de esas imágenes.
-- Google Fonts (Poppins) — tipografía de toda la interfaz (los documentos/tarjetas usan
-  `Segoe UI` a propósito, ver más abajo).
+- Google Fonts (Poppins) — tipografía de toda la interfaz (sidebar, panel, modal). El comunicado
+  en sí usa `ZT Nature` (self-hosted, ver `fonts/` arriba), no Poppins ni Google Fonts — esa
+  separación de tipografías entre "el documento oficial" y "la interfaz" es intencional.
 
 Si esto se despliega sin internet, hay que vendorizar esos tres scripts.
 
@@ -54,21 +60,27 @@ una segunda hoja casi en blanco por errores de redondeo en su paginado automáti
 
 No reintroduzcas `html2pdf.js` para esto sin volver a probar ese caso límite.
 
+Se probó en su momento cambiar esto por `window.print()` (impresión nativa del navegador) para que
+el PDF saliera con texto seleccionable y links cliqueables. Se volvió atrás: en la práctica el logo
+y la franja de bandera no salían en la impresión real (aunque en capturas automatizadas sí), y de
+paso cambiaba la descarga de un click a tener que pasar por el diálogo de impresión — dos motivos
+por los que el usuario pidió revertirlo. Si se retoma esa idea alguna vez, hay que probarla a fondo
+en un navegador real (no headless) antes de asumir que quedó bien.
+
 ### 2. `.documento` y `.tarjeta` tienen que quedar intactos
 
-El CSS de `.documento`, `.bandera-lateral`, `.header`, `.cuerpo`, `.footer`, `.tarjeta*` es el
-diseño "oficial" de la Federazione (colores de la bandera italiana, tipografía `Segoe UI`,
-medidas en `mm` reales para que impriman exacto en A4 / 90×50mm). Todo lo demás (sidebar, panel
-derecho, modal, botones) es "la interfaz" y usa `Poppins` — esa separación de tipografías es
-intencional, no un olvido.
+El CSS de `.documento`, `.header-membrete`, `.cuerpo`, `.footer`, `.bandera-inferior`, `.tarjeta*`
+es el diseño "oficial" de la Federazione (logo y franja de bandera de `logo.png`/`bandera.svg`,
+tipografía `ZT Nature`, medidas en `mm` reales para que impriman exacto en A4 / 90×50mm). Todo lo
+demás (sidebar, panel derecho, modal, botones) es "la interfaz" y usa `Poppins` — esa separación de
+tipografías es intencional, no un olvido.
 
 ### 3. El `@media print` es un respaldo, no el camino principal
 
 El botón verde "Descargar PDF" genera el archivo por JS (ver punto 1) y no dispara el diálogo de
 impresión del navegador. El bloque `@media print` en `style.css` sigue existiendo por si alguien
 hace `Ctrl+P` manualmente; tiene su propio arreglo para el bug de la doble hoja (fuerza
-`height: 297mm` + `overflow: hidden` en `.documento`, y pasa `.bandera-lateral` de `fixed` a
-`absolute` para que no se duplique en una hipotética segunda página).
+`height: 297mm` + `overflow: hidden` en `.documento`).
 
 ### 4. El layout de 3 columnas usa 4 columnas `1fr` iguales, no `calc()`
 
