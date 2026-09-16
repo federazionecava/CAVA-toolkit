@@ -24,6 +24,7 @@
   --bg-page: #eef1f3;
   --panel-bg: #ffffff;
   --border-soft: #e9ecef;
+  --divisor-sidebar: #d3d8dd;
   --text-main: #23262b;
   --text-muted: #8a8f98;
   --brand-green: #009246;
@@ -239,7 +240,7 @@ a.link-limpio:hover {
   align-items: center;
   gap: 10px;
   padding: 2px 4px 16px 4px;
-  border-bottom: 1px dashed var(--border-soft);
+  border-bottom: 1px solid var(--divisor-sidebar);
   margin-bottom: 8px;
 }
 .sidebar-brand img { width: 34px; height: 34px; object-fit: contain; }
@@ -251,7 +252,7 @@ a.link-limpio:hover {
   line-height: 1.25;
   color: var(--text-main);
 }
-.sidebar-brand-title span { color: var(--brand-red); }
+.sidebar-brand-title span { color: var(--brand-green); }
 
 .sidebar-seccion-titulo {
   font-size: 11px;
@@ -280,7 +281,7 @@ a.link-limpio:hover {
 }
 .sidebar-btn:hover { background: #f4f5f7; color: var(--text-main); }
 .sidebar-btn.activo { background: var(--brand-green-soft); color: var(--brand-green); }
-.sidebar-btn.ayuda { color: #a97300; margin-top: 10px; border-top: 1px dashed var(--border-soft); border-radius: 0; padding-top: 16px; }
+.sidebar-btn.ayuda { color: #a97300; margin-top: 10px; border-top: 1px solid var(--divisor-sidebar); border-radius: 0; padding-top: 16px; }
 .sidebar-btn.ayuda:hover { background: #fff7e6; color: #8a6100; border-radius: var(--radius-sm); }
 
 .main-panel {
@@ -353,45 +354,69 @@ a.link-limpio:hover {
   padding: 34px;
 }
 .tarjeta {
-  width: 90mm;
-  height: 50mm;
+  /* 117x65mm = 90x50mm real (tamaño físico de impresión, sin cambios) escalado x1.3 solo para
+     que la vista previa se vea más grande — el PDF/imagen exportados siguen siendo 90x50mm
+     porque descargarTarjetasPDF()/descargarTarjetasPNG() estiran la captura a ese tamaño fijo. */
+  width: 117mm;
+  height: 65mm;
   background: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.12);
   box-sizing: border-box;
   overflow: hidden;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  position: relative;
+  font-family: 'ZT Nature', 'Segoe UI', system-ui, sans-serif;
   flex-shrink: 0;
 }
+/* Misma franja de bandera que el comunicado, de punta a punta, clavada abajo de cada cara */
+.bandera-tarjeta {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 3.9mm;
+  line-height: 0;
+}
+.bandera-tarjeta img { width: 100%; height: 100%; display: block; }
+
 .tarjeta-frente {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 5mm;
+  gap: 10px;
+  padding: 6.5mm 6.5mm 7.8mm 6.5mm;
   text-align: center;
 }
-.tarjeta-frente img { max-width: 32mm; max-height: 18mm; object-fit: contain; }
-.tarjeta-frente h2 { margin: 0; font-size: 15px; color: #009246; letter-spacing: 0.5px; }
-.tarjeta-frente h2 span { color: #ce2b37; font-weight: 800; }
+.tarjeta-frente .logo-tarjeta { max-width: 31.2mm; max-height: 22.1mm; object-fit: contain; }
+.tarjeta-frente h2 { margin: 0; font-size: 20px; font-weight: 700; color: #000; letter-spacing: 0.3px; }
+.tarjeta-frente .subtitulo-tarjeta { margin: 0; font-size: 12px; font-weight: 400; color: #000; }
 .tarjeta-dorso {
   display: flex;
   align-items: center;
-  gap: 4mm;
-  padding: 5mm;
+  gap: 5.2mm;
+  padding: 6.5mm 6.5mm 7.8mm 6.5mm;
+  position: relative;
+}
+.tarjeta-dorso .logo-tarjeta-mini {
+  position: absolute;
+  top: 3.9mm;
+  right: 5.2mm;
+  width: 15.6mm;
+  height: auto;
+  object-fit: contain;
 }
 .tarjeta-dorso .qr {
-  width: 22mm;
-  height: 22mm;
+  width: 28.6mm;
+  height: 28.6mm;
   object-fit: contain;
   flex-shrink: 0;
   border: 1px dashed #ccc;
 }
-.tarjeta-dorso .datos { font-size: 9px; color: #333; line-height: 1.5; overflow: hidden; }
-.tarjeta-dorso .datos b { display: block; font-size: 12px; color: #009246; }
-.tarjeta-dorso .datos .email { color: #666; }
+.tarjeta-dorso .datos { font-size: 12px; color: #000; line-height: 1.5; overflow: hidden; }
+.tarjeta-dorso .datos b { display: block; font-size: 16px; font-weight: 700; color: #000; }
+.tarjeta-dorso .datos .email { color: #444; }
 
 /* ---------- Panel derecho: herramientas de texto (Comunicados) o formulario (Tarjetas) ---------- */
 .panel-derecho {

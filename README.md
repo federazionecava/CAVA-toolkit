@@ -123,9 +123,7 @@ celular/tablet, solo para que no se rompa entre distintas resoluciones de PC/not
 
 ## Pendientes / cosas a resolver con el cliente
 
-- Los `<img src="https://PEGAR-AQUI-EL-LINK-AL-LOGO.png">` (en el header del comunicado y en el
-  frente de la tarjeta) y `https://PEGAR-AQUI-EL-LINK-AL-QR.png` (dorso de la tarjeta) son
-  placeholders. Hay que reemplazarlos por las URLs reales del logo y del QR de la Federazione.
-- El favicon usa `iconoweb.png` (el archivo que hay en la carpeta). Si en algún momento piden
-  `iconitoweb.png` u otro nombre, es probable que sea el mismo archivo con otro nombre esperado —
-  confirmar con el usuario antes de asumir.
+- El favicon usa `iconoweb.png` (el archivo que hay en la carpeta, la banderita italiana redonda —
+  distinto de `logo.png`, que es el logo con el león y el texto CAVA usado en el membrete, el
+  sidebar y las tarjetas). Si en algún momento piden `iconitoweb.png` u otro nombre, es probable
+  que sea el mismo archivo con otro nombre esperado — confirmar con el usuario antes de asumir.
