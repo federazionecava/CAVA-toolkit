@@ -47,7 +47,7 @@ img/         → todas las imágenes de la app:
               - loading.jpg (2400x1260px) → miniatura que usan las meta tags Open Graph/Twitter
                 Card del `<head>` para la vista previa al compartir el link por WhatsApp/redes.
                 No se referencia por ruta relativa sino por URL absoluta
-                (`https://cava-toolkit.vercel.app/img/loading.jpg`) — ver el comentario junto a
+                (`https://generador-cava.vercel.app/img/loading.jpg`) — ver el comentario junto a
                 esas meta tags en `index.html` si cambia el dominio de despliegue.
               - logo_doc.svg → NO está referenciado en ningún lado del código (ni index.html, ni
                 css/, ni js/) — quedó ahí de alguna iteración anterior; antes de borrarlo,
