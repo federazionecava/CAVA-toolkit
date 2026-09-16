@@ -50,8 +50,6 @@
               <br>
               <p>Estimados/as,</p>
               <p>[Escriba aquí el contenido de su comunicado]</p>
-              <br><br>
-              <p style="text-align: center;">___________________________<br>[Firma y Cargo]</p>
             </div>
 
             <!-- FOOTER CLAVADO Y CLIQUEABLE (fuera del contenteditable: los links nunca se pueden editar) -->
@@ -80,17 +78,21 @@
       <div id="vista-tarjetas" class="vista">
         <div class="tarjetas-preview" id="tarjetas-preview">
           <div class="tarjeta tarjeta-frente" id="tarjeta-frente">
-            <img src="https://PEGAR-AQUI-EL-LINK-AL-LOGO.png" alt="Logo CAVA">
-            <h2>FEDERAZIONE <span>CAVA</span></h2>
+            <img class="logo-tarjeta" src="logo.png" alt="Logo CAVA">
+            <h2>Federazione CAVA</h2>
+            <p class="subtitulo-tarjeta">Comitato delle Associazioni Venete dell'Argentina</p>
+            <div class="bandera-tarjeta"><img src="bandera.svg" alt=""></div>
           </div>
           <div class="tarjeta tarjeta-dorso" id="tarjeta-dorso">
-            <img class="qr" src="https://PEGAR-AQUI-EL-LINK-AL-QR.png" alt="Código QR">
+            <img class="logo-tarjeta-mini" src="logo.png" alt="Logo CAVA">
+            <img class="qr" src="qr.png" alt="Código QR">
             <div class="datos">
               <b id="tj-out-nombre">Nombre Apellido</b>
               <span id="tj-out-cargo">Cargo</span><br>
               <span id="tj-out-celular">Celular</span><br>
               <span class="email">federazionecava@gmail.com</span>
             </div>
+            <div class="bandera-tarjeta"><img src="bandera.svg" alt=""></div>
           </div>
         </div>
       </div>
@@ -214,26 +216,24 @@
       <button class="modal-cerrar" onclick="cerrarAyuda()" aria-label="Cerrar">✕</button>
       <h2 class="modal-titulo">🛟 ¿Cómo funciona esto?</h2>
 
-      <p>El <b>Portal CAVA</b> sirve para armar dos cosas oficiales de la Federazione, sin instalar nada ni usar Word: <b>comunicados</b> en hoja A4 membretada y <b>tarjetas personales</b> con QR. Todo se descarga listo para imprimir con un solo botón.</p>
+      <p>El <b>Generador CAVA</b> arma dos cosas oficiales de la Federazione y las descarga en PDF con un clic: <b>comunicados</b> A4 y <b>tarjetas personales</b> con QR.</p>
 
       <h3 class="modal-subtitulo">📄 Comunicados A4</h3>
       <ul>
-        <li>Elegí <b>"Comunicados A4"</b> en el menú de la izquierda.</li>
-        <li>Escribí tu texto directamente sobre la hoja blanca, donde dice "Escribe aquí tu comunicado...".</li>
-        <li>Para darle formato, seleccioná el texto que escribiste y usá los botones del <b>panel de la derecha</b>: negrita, cursiva, subrayado, tachado, viñetas, listas numeradas, alineación, color de letra, marcador y tamaño de letra.</li>
-        <li>Los datos del pie de página (dirección, WhatsApp, mail, redes) ya están cargados y son clickeables — no hace falta tocarlos.</li>
-        <li>Cuando termines, tocá el botón verde <b>"Descargar PDF"</b>: te baja el archivo ya listo para imprimir, en una sola hoja.</li>
+        <li>Elegí <b>"Comunicados A4"</b> y escribí tu texto sobre la hoja.</li>
+        <li>Para darle formato (negrita, color, listas, etc.) seleccioná el texto y usá los botones de la derecha.</li>
+        <li>El pie de página (dirección, WhatsApp, mail, redes) ya viene cargado y cliqueable.</li>
+        <li>Tocá <b>"Descargar PDF"</b> y listo.</li>
       </ul>
 
       <h3 class="modal-subtitulo">🪪 Tarjetas Personales</h3>
       <ul>
-        <li>Elegí <b>"Tarjetas Personales"</b> en el menú de la izquierda.</li>
-        <li>Completá <b>Nombre, Cargo y Celular</b> en el panel de la derecha: se van actualizando solos en el dorso de la tarjeta, a medida que escribís.</li>
-        <li>El frente (logo y nombre institucional) y el mail de contacto del dorso son fijos, no se editan.</li>
-        <li>Descargala con <b>"Descargar PDF"</b> (el frente y el dorso, cada uno en una hoja de 90x50mm, lista para imprimir) o con <b>"Descargar Imagen"</b> (un PNG con las dos caras juntas).</li>
+        <li>Elegí <b>"Tarjetas Personales"</b> y completá Nombre, Cargo y Celular a la derecha.</li>
+        <li>El logo del frente y el mail del dorso son fijos, no se editan.</li>
+        <li>Descargala en <b>PDF</b> o como <b>Imagen</b>.</li>
       </ul>
 
-      <p>Podés volver a abrir esta ayuda cuando quieras con el botón "¿Cómo funciona esto?" del menú. 🇮🇹</p>
+      <p>Podés volver a abrir esta ayuda cuando quieras. 🇮🇹</p>
     </div>
   </div>
 
