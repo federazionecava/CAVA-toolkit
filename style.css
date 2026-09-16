@@ -61,7 +61,6 @@ body {
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   position: relative;
   box-sizing: border-box;
-  padding-left: 12mm;
   font-family: 'Segoe UI', system-ui, sans-serif;
   /* Hacemos que el documento actúe como Flexbox para que el footer baje al final siempre */
   display: flex;
@@ -69,59 +68,67 @@ body {
   flex-shrink: 0;
 }
 
-/* Bandera lateral */
-.bandera-lateral {
+/* Franja de bandera, clavada abajo de toda la hoja (position: absolute respecto de .documento) */
+.bandera-inferior {
   position: absolute;
-  top: 0; left: 0; bottom: 0;
-  width: 12mm;
-  display: flex;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 8.8mm;
+  line-height: 0;
 }
-.verde { width: 33.33%; background: #009246; }
-.blanco { width: 33.34%; background: #f4f4f4; }
-.rojo { width: 33.33%; background: #ce2b37; }
+.bandera-inferior img { width: 100%; height: 100%; display: block; }
 
 .contenido {
-  padding: 15mm 20mm 15mm 15mm;
+  padding: 8.8mm 25.8mm 20mm 25.8mm; /* abajo dejamos lugar para el footer + la franja de bandera */
   display: flex;
   flex-direction: column;
   flex-grow: 1; /* Ocupa todo el espacio de la hoja A4 */
   box-sizing: border-box;
+  color: #000;
 }
 
-.header {
+.header-membrete {
   display: flex;
-  justify-content: flex-start;
+  flex-direction: column;
   align-items: center;
-  gap: 25px;
-  border-bottom: 2px solid #f0f0f0;
-  padding-bottom: 15px;
+  text-align: center;
 }
-.header img {
-  max-height: 85px;
-  max-width: 130px;
+.header-membrete .logo-membrete {
+  width: 32.2mm;
+  height: 23.3mm;
   object-fit: contain;
 }
-.header h1 { margin: 0; font-size: 26px; color: #009246; letter-spacing: 0.5px; }
-.header h1 span { color: #ce2b37; font-weight: 800; }
-.header p { margin: 4px 0 0 0; font-size: 11px; color: #666; letter-spacing: 1px;}
+.header-membrete h1 { margin: 2mm 0 0 0; font-size: 26px; font-weight: 700; color: #000; letter-spacing: 0.3px; }
+.header-membrete p { margin: 1mm 0 0 0; font-size: 19px; font-weight: 400; color: #000; }
+
+.divisor {
+  border: none;
+  border-top: 1px solid #000;
+  width: 100%;
+  margin: 6mm 0 0 0;
+}
 
 .cuerpo {
-  margin: 30px 0;
+  margin: 8mm 0 6mm 0;
   flex-grow: 1;
   outline: none;
+  color: #000;
 }
 .cuerpo p { line-height: 1.6; margin-bottom: 10px; }
 
 .footer {
-  font-size: 10px;
-  color: #777;
-  border-top: 1px solid #eee;
-  padding-top: 15px;
-  line-height: 1.6;
+  color: #000;
   margin-top: auto; /* Magia: siempre lo empuja clavado al fondo */
   user-select: none;
 }
-.footer b { color: #555; }
+.footer .divisor { margin-top: 0; margin-bottom: 2.7mm; }
+.footer-texto {
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+.footer b { color: #000; }
 
 /* Enlaces interactivos que parecen texto formal */
 a.link-limpio {
@@ -149,17 +156,12 @@ a.link-limpio:hover {
     height: 297mm;
     min-height: 297mm;
     max-height: 297mm;
-    padding-left: 0;
     display: block;
     overflow: hidden;
     page-break-after: avoid;
     page-break-inside: avoid;
   }
-  /* La pasamos de "fixed" a "absolute": así vive adentro de los 297mm del documento
-     y no se repite duplicada en una hipotética 2da página. */
-  .bandera-lateral { position: absolute; height: 297mm; }
   .contenido {
-    padding-left: 27mm; padding-right: 20mm; padding-top: 15mm; padding-bottom: 20mm;
     display: block;
     height: 297mm;
     box-sizing: border-box;
