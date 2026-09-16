@@ -44,6 +44,11 @@ img/         → todas las imágenes de la app:
                 Hubo una vuelta donde se probó `logo.png` como favicon y se volvió atrás — la
                 Federazione prefiere la banderita redonda para la pestaña del navegador.
               - qr.png → QR fijo del dorso de la Tarjeta Personal
+              - loading.jpg (2400x1260px) → miniatura que usan las meta tags Open Graph/Twitter
+                Card del `<head>` para la vista previa al compartir el link por WhatsApp/redes.
+                No se referencia por ruta relativa sino por URL absoluta
+                (`https://cava-toolkit.vercel.app/img/loading.jpg`) — ver el comentario junto a
+                esas meta tags en `index.html` si cambia el dominio de despliegue.
               - logo_doc.svg → NO está referenciado en ningún lado del código (ni index.html, ni
                 css/, ni js/) — quedó ahí de alguna iteración anterior; antes de borrarlo,
                 confirmar con el usuario que de verdad no hace falta
@@ -248,9 +253,3 @@ un descuido, estás sacando ese contraste a propósito buscado.
   `css/style.css`, ni en ningún archivo de `js/`. Puede ser un archivo de una iteración vieja del
   diseño que quedó dando vueltas — confirmar con el cliente si todavía hace falta antes de
   borrarlo (no se borró por las dudas).
-- **Falta subir `img/loading.png`.** Las meta tags Open Graph/Twitter Card del `<head>` (para que
-  WhatsApp y redes muestren una miniatura al compartir el link) ya apuntan a
-  `https://cava-toolkit.vercel.app/img/loading.png`, pero ese archivo todavía no existe en el
-  repo — lo tiene que subir el cliente a `img/`. Medida recomendada: 1200×630px. Si el dominio de
-  despliegue cambia de `cava-toolkit.vercel.app`, hay que actualizar las URLs absolutas de
-  `og:url`, `og:image` y `twitter:image` en `index.html` (ver el comentario ahí mismo).
