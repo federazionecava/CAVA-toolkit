@@ -35,7 +35,7 @@
    ============================================================ */
 :root {
   --panel-w: 260px;
-  --bg-page: #eef1f3;
+  --bg-page: #dde1e5;
   --panel-bg: #ffffff;
   --border-soft: #e9ecef;
   --divisor-sidebar: #d3d8dd;
@@ -60,7 +60,7 @@ body {
   margin: 0;
   box-sizing: border-box;
   font-family: 'ZT Nature', 'Segoe UI', system-ui, sans-serif;
-  background: linear-gradient(180deg, #f7f8f9 0%, #eef1f3 100%);
+  background: linear-gradient(180deg, #e9ecef 0%, #dde1e5 100%);
   height: 100vh;
   overflow: hidden; /* la página en sí no scrollea: adentro, solo la hoja tiene su propio scroll */
   display: flex;

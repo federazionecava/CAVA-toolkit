@@ -3,7 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <title>Generador CAVA</title>
-  <link rel="icon" type="image/png" href="img/logo.png">
+  <meta name="description" content="Generador de documentos de la Federazione CAVA: comunicados oficiales y tarjetas personales, listos para descargar en PDF.">
+
+  <!-- Vista previa al compartir el link (WhatsApp, redes sociales). Requiere que img/loading.png
+       exista y que la app esté publicada en https://cava-toolkit.vercel.app/ — si cambia el
+       dominio de despliegue, hay que actualizar estas URLs absolutas (og:image/og:url no
+       funcionan bien como rutas relativas: el crawler de WhatsApp/Meta las resuelve peor que un
+       navegador). Medida recomendada para og:image: 1200x630px. -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cava-toolkit.vercel.app/">
+  <meta property="og:title" content="Generador CAVA">
+  <meta property="og:description" content="Generador de documentos de la Federazione CAVA: comunicados oficiales y tarjetas personales, listos para descargar en PDF.">
+  <meta property="og:image" content="https://cava-toolkit.vercel.app/img/loading.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Generador CAVA">
+  <meta name="twitter:description" content="Generador de documentos de la Federazione CAVA: comunicados oficiales y tarjetas personales, listos para descargar en PDF.">
+  <meta name="twitter:image" content="https://cava-toolkit.vercel.app/img/loading.png">
+
+  <link rel="icon" type="image/png" href="img/iconoweb.png">
 
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -52,13 +69,13 @@
             <div class="footer">
               <hr class="divisor">
               <div class="footer-texto">
-                <a class="link-limpio" href="https://maps.google.com/?q=Diputado+Nacional+Osvaldo+E.+Benedetti+195,+CABA,+Argentina" target="_blank" title="Abrir en Google Maps">📍 Dip. Nac. Osvaldo E. Benedetti, 195 – CABA – ARGENTINA</a><br>
-                📞 <b>Tel:</b>
+                <a class="link-limpio" href="https://maps.google.com/?q=Diputado+Nacional+Osvaldo+E.+Benedetti+195,+CABA,+Argentina" target="_blank" title="Abrir en Google Maps">Dip. Nac. Osvaldo E. Benedetti, 195 – CABA – ARGENTINA</a><br>
+                <b>WhatsApp:</b>
                 <a class="link-limpio" href="https://wa.me/5492615338834" target="_blank" title="Enviar WhatsApp a +54 9 261 5338834">+54 9 261 5338834</a> /
                 <a class="link-limpio" href="https://wa.me/5493512146193" target="_blank" title="Enviar WhatsApp a +54 9 351 2146193">+54 9 351 2146193</a> |
-                ✉️ <b>Email:</b> <a class="link-limpio" href="mailto:federazionecava@gmail.com">federazionecava@gmail.com</a><br>
-                🌐 <b>Web:</b> <a class="link-limpio" href="https://federazionecava.org" target="_blank">federazionecava.org</a> |
-                📱 <b>Instagram:</b> <a class="link-limpio" href="https://www.instagram.com/federazionecava/" target="_blank">@federazionecava</a>
+                <b>Email:</b> <a class="link-limpio" href="mailto:federazionecava@gmail.com">federazionecava@gmail.com</a><br>
+                <b>Web:</b> <a class="link-limpio" href="https://federazionecava.org" target="_blank">federazionecava.org</a> |
+                <b>Instagram:</b> <a class="link-limpio" href="https://www.instagram.com/federazionecava/" target="_blank">@federazionecava</a>
               </div>
             </div>
 
@@ -206,7 +223,7 @@
           <input type="text" id="tj-cargo" placeholder="Secretario" oninput="actualizarTarjeta()">
         </label>
         <label>Celular
-          <input type="text" id="tj-celular" placeholder="+54 9 ..." oninput="actualizarTarjeta()">
+          <input type="text" id="tj-celular" placeholder="+54 9 ...">
         </label>
         <div class="acciones">
           <button class="btn" onclick="descargarTarjetasPDF()">⬇️ Descargar PDF</button>
@@ -247,6 +264,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/libphonenumber-js/1.13.13/libphonenumber-js.min.js"></script>
   <script src="js/fonts-zt-nature.js"></script>
   <script src="js/imagenes-comunicado.js"></script>
   <script src="js/pdf-comunicado.js"></script>
