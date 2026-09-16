@@ -40,7 +40,9 @@
       <div class="sidebar-seccion-titulo">Documentos</div>
       <button class="sidebar-btn activo" data-vista="comunicados" onclick="mostrarVista('comunicados', this)">📄 Comunicados A4</button>
       <button class="sidebar-btn" data-vista="tarjetas" onclick="mostrarVista('tarjetas', this)">🪪 Tarjetas Personales</button>
-      <button class="sidebar-btn ayuda" onclick="abrirAyuda()">🛟 ¿Cómo funciona esto?</button>
+      <div class="separador"></div>
+      <div class="sidebar-seccion-titulo">Ayuda</div>
+      <button class="sidebar-btn" onclick="abrirAyuda()">🛟 ¿Cómo funciona esto?</button>
     </div>
 
     <!-- CENTRO: LA HOJA A4 O LA VISTA PREVIA DE TARJETAS -->
@@ -124,47 +126,47 @@
         <div class="grupo-titulo">Texto y párrafo</div>
         <div class="grid-herramientas">
           <div class="toolbar-celda">
-            <button class="icono" onclick="formatoTexto('bold')" title="Poner en negrita"><b>N</b></button>
+            <button class="icono" data-comando="bold" onclick="formatoTexto('bold')" title="Poner en negrita"><b>N</b></button>
             <span class="etiqueta">Negrita</span>
           </div>
           <div class="toolbar-celda">
-            <button class="icono" onclick="formatoTexto('italic')" title="Poner en cursiva"><i>C</i></button>
+            <button class="icono" data-comando="italic" onclick="formatoTexto('italic')" title="Poner en cursiva"><i>C</i></button>
             <span class="etiqueta">Cursiva</span>
           </div>
           <div class="toolbar-celda">
-            <button class="icono" onclick="formatoTexto('underline')" title="Subrayar el texto"><u>S</u></button>
+            <button class="icono" data-comando="underline" onclick="formatoTexto('underline')" title="Subrayar el texto"><u>S</u></button>
             <span class="etiqueta">Subrayado</span>
           </div>
           <div class="toolbar-celda">
-            <button class="icono" onclick="formatoTexto('strikeThrough')" title="Tachar el texto"><s>T</s></button>
+            <button class="icono" data-comando="strikeThrough" onclick="formatoTexto('strikeThrough')" title="Tachar el texto"><s>T</s></button>
             <span class="etiqueta">Tachado</span>
           </div>
           <div class="toolbar-celda">
-            <button class="icono" onclick="formatoTexto('insertUnorderedList')" title="Lista con viñetas">
+            <button class="icono" data-comando="insertUnorderedList" onclick="formatoTexto('insertUnorderedList')" title="Lista con viñetas">
               <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="4" cy="6" r="1.1" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.1" fill="currentColor" stroke="none"/><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/></svg>
             </button>
             <span class="etiqueta">Viñetas</span>
           </div>
           <div class="toolbar-celda">
-            <button class="icono" onclick="formatoTexto('insertOrderedList')" title="Lista numerada">
+            <button class="icono" data-comando="insertOrderedList" onclick="formatoTexto('insertOrderedList')" title="Lista numerada">
               <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><text x="1.5" y="8.2" font-size="6.5" font-weight="700" stroke="none" fill="currentColor">1</text><text x="1.5" y="14.2" font-size="6.5" font-weight="700" stroke="none" fill="currentColor">2</text><text x="1.5" y="20.2" font-size="6.5" font-weight="700" stroke="none" fill="currentColor">3</text></svg>
             </button>
             <span class="etiqueta">Lista numerada</span>
           </div>
           <div class="toolbar-celda">
-            <button class="icono" onclick="formatoTexto('justifyLeft')" title="Alinear a la izquierda">
+            <button class="icono" data-comando="justifyLeft" onclick="formatoTexto('justifyLeft')" title="Alinear a la izquierda">
               <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
             </button>
             <span class="etiqueta">Alinear izq.</span>
           </div>
           <div class="toolbar-celda">
-            <button class="icono" onclick="formatoTexto('justifyCenter')" title="Centrar el texto">
+            <button class="icono" data-comando="justifyCenter" onclick="formatoTexto('justifyCenter')" title="Centrar el texto">
               <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4.5" y1="18" x2="19.5" y2="18"/></svg>
             </button>
             <span class="etiqueta">Centrar</span>
           </div>
           <div class="toolbar-celda">
-            <button class="icono" onclick="formatoTexto('justifyRight')" title="Alinear a la derecha">
+            <button class="icono" data-comando="justifyRight" onclick="formatoTexto('justifyRight')" title="Alinear a la derecha">
               <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>
             </button>
             <span class="etiqueta">Alinear der.</span>
@@ -212,6 +214,12 @@
             </button>
             <span class="etiqueta">Rehacer</span>
           </div>
+          <div class="toolbar-celda">
+            <button class="icono icono-alerta" onclick="nuevoComunicado()" title="Nuevo comunicado (borra todo el texto actual)">
+              <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><path d="M14 2v6h6"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            </button>
+            <span class="etiqueta">Nuevo comunicado</span>
+          </div>
         </div>
 
         <button class="btn" onclick="descargarComunicadoPDF()">⬇️ Descargar PDF</button>
@@ -220,13 +228,13 @@
       <div class="panel-derecho-seccion" id="seccion-tarjeta">
         <h3 class="panel-derecho-titulo">Datos de tu tarjeta</h3>
         <label>Nombre y Apellido
-          <input type="text" id="tj-nombre" placeholder="Juan Pérez" oninput="actualizarTarjeta()">
+          <input type="text" id="tj-nombre" placeholder="Ej: Juan Pérez" oninput="actualizarTarjeta()">
         </label>
         <label>Cargo
-          <input type="text" id="tj-cargo" placeholder="Secretario" oninput="actualizarTarjeta()">
+          <input type="text" id="tj-cargo" placeholder="Ej: Secretario" oninput="actualizarTarjeta()">
         </label>
         <label>Celular
-          <input type="text" id="tj-celular" placeholder="+54 9 ...">
+          <input type="text" id="tj-celular" placeholder="Ej: +54 9 261 5338834">
         </label>
         <div class="acciones">
           <button class="btn" onclick="descargarTarjetasPDF()">⬇️ Descargar PDF</button>

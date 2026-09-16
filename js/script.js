@@ -14,6 +14,7 @@ function mostrarVista(nombre, btn) {
 function formatoTexto(comando, valor) {
   document.querySelector('#documento-a4 .cuerpo').focus();
   document.execCommand(comando, false, valor || null);
+  actualizarEstadoToolbar();
 }
 
 function resaltarTexto(color) {
@@ -21,6 +22,7 @@ function resaltarTexto(color) {
   document.execCommand('styleWithCSS', false, true);
   const ok = document.execCommand('hiliteColor', false, color);
   if (!ok) document.execCommand('backColor', false, color);
+  actualizarEstadoToolbar();
 }
 
 // Tamaño de letra a pura fuerza de botones (nada de <select> para scrollear)
@@ -29,6 +31,79 @@ function ajustarTamano(delta) {
   tamanoActual = Math.min(7, Math.max(1, tamanoActual + delta));
   formatoTexto('fontSize', String(tamanoActual));
 }
+
+// Resalta en la toolbar el formato que tiene el texto donde está parado el cursor
+// (negrita/cursiva/subrayado/tachado/listas/alineación), usando queryCommandState —
+// así el usuario ve de un vistazo si lo que va a escribir sale en negrita, sin tener
+// que seleccionar el texto y mirarlo. Se llama tanto al mover el cursor/seleccionar
+// (selectionchange, keyup, mouseup) como después de aplicar un comando desde la
+// toolbar (formatoTexto/resaltarTexto), porque no todos los navegadores disparan
+// selectionchange de forma confiable al ejecutar execCommand.
+function actualizarEstadoToolbar() {
+  const cuerpo = document.querySelector('#documento-a4 .cuerpo');
+  const sel = document.getSelection();
+  const dentro = !!(sel && sel.anchorNode && cuerpo.contains(sel.anchorNode));
+
+  document.querySelectorAll('.icono[data-comando]').forEach((btn) => {
+    const comando = btn.dataset.comando;
+    let activo = false;
+    if (dentro) {
+      try { activo = document.queryCommandState(comando); } catch (e) { activo = false; }
+    }
+    btn.classList.toggle('activo', activo);
+  });
+
+  // queryCommandState('justifyLeft') da false en párrafos nuevos que nunca tuvieron
+  // un comando de alineación aplicado explícitamente, aunque se vean alineados a la
+  // izquierda (es el default del navegador) — por eso se marca "activo" también
+  // cuando ni centrado ni derecha están activos, no solo cuando justifyLeft lo está.
+  const btnIzquierda = document.querySelector('.icono[data-comando="justifyLeft"]');
+  if (btnIzquierda) {
+    const centro = dentro && document.queryCommandState('justifyCenter');
+    const derecha = dentro && document.queryCommandState('justifyRight');
+    btnIzquierda.classList.toggle('activo', dentro && !centro && !derecha);
+  }
+}
+
+document.addEventListener('selectionchange', actualizarEstadoToolbar);
+document.querySelector('#documento-a4 .cuerpo').addEventListener('keyup', actualizarEstadoToolbar);
+document.querySelector('#documento-a4 .cuerpo').addEventListener('mouseup', actualizarEstadoToolbar);
+
+// Plantilla original del comunicado, capturada al cargar la página (antes de que el usuario
+// escriba nada), para poder volver a ella con "Nuevo comunicado" sin tener que recargar F5.
+const PLANTILLA_COMUNICADO = document.querySelector('#documento-a4 .cuerpo').innerHTML;
+
+function nuevoComunicado() {
+  if (!confirm('¿Empezar un comunicado nuevo? Se va a borrar todo el texto actual.')) return;
+  const cuerpo = document.querySelector('#documento-a4 .cuerpo');
+  cuerpo.innerHTML = PLANTILLA_COMUNICADO;
+  actualizarEstadoToolbar();
+  programarActualizacionSaltos();
+}
+
+// Marca en pantalla dónde corta cada hoja al exportar a PDF (ver calcularSaltosDePaginaComunicado
+// en pdf-comunicado.js). Se recalcula con debounce en cada tecleo: el cálculo arma un PDF de
+// mentira solo para medir, así que no conviene correrlo en cada tecla suelta.
+let saltosPaginaTimeout = null;
+async function actualizarSaltosDePagina() {
+  const documento = document.getElementById('documento-a4');
+  documento.querySelectorAll('.marca-salto-pagina').forEach((el) => el.remove());
+  const saltos = await calcularSaltosDePaginaComunicado();
+  saltos.forEach((mm) => {
+    const marca = document.createElement('div');
+    marca.className = 'marca-salto-pagina';
+    marca.style.top = mm + 'mm';
+    documento.appendChild(marca);
+  });
+}
+
+function programarActualizacionSaltos() {
+  clearTimeout(saltosPaginaTimeout);
+  saltosPaginaTimeout = setTimeout(actualizarSaltosDePagina, 400);
+}
+
+document.querySelector('#documento-a4 .cuerpo').addEventListener('input', programarActualizacionSaltos);
+programarActualizacionSaltos();
 
 function abrirAyuda() { document.getElementById('modal-ayuda').classList.add('activo'); }
 function cerrarAyuda() { document.getElementById('modal-ayuda').classList.remove('activo'); }

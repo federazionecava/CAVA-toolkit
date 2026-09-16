@@ -175,6 +175,29 @@ a.link-limpio:hover {
   color: #009246;
 }
 
+/* Línea que marca dónde corta la hoja al exportar a PDF (ver calcularSaltosDePaginaComunicado
+   en pdf-comunicado.js). Puramente informativa en pantalla — nunca sale en el PDF ni al imprimir. */
+.marca-salto-pagina {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 0;
+  border-top: 1px dashed #c9cdd3;
+  pointer-events: none;
+}
+.marca-salto-pagina::after {
+  content: 'Fin de hoja';
+  position: absolute;
+  top: -8px;
+  right: 6mm;
+  background: #ffffff;
+  padding: 0 5px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #9aa0a8;
+}
+
 /* EXPORTACIÓN A PDF / IMPRESIÓN NATIVA */
 @media print {
   @page { size: A4; margin: 0; }
@@ -182,7 +205,7 @@ a.link-limpio:hover {
   body { background: none; padding: 0; display: block; }
   /* OJO: acá NO se puede meter ".app-shell" a "display:none" — es el padre de ".documento"
      y lo taparía a él también, dejando la impresión en blanco. Solo se ocultan sus hijos. */
-  .sidebar, .panel-derecho, #vista-tarjetas, .modal-overlay { display: none !important; }
+  .sidebar, .panel-derecho, #vista-tarjetas, .modal-overlay, .marca-salto-pagina { display: none !important; }
   .app-shell { display: block; width: auto; height: auto; }
   .main-panel { display: block; height: auto; overflow: visible; padding: 0; }
   /* La hoja queda clavada a EXACTAMENTE 297mm y con overflow oculto: cualquier redondeo de píxeles
@@ -278,7 +301,7 @@ a.link-limpio:hover {
 }
 
 .sidebar-btn {
-  background: transparent;
+  background: #f4f5f7;
   border: none;
   color: var(--text-muted);
   padding: 12px 14px;
@@ -293,10 +316,8 @@ a.link-limpio:hover {
   align-items: center;
   gap: 10px;
 }
-.sidebar-btn:hover { background: #f4f5f7; color: var(--text-main); }
+.sidebar-btn:hover { background: var(--brand-green-soft); color: var(--brand-green); }
 .sidebar-btn.activo { background: var(--brand-green-soft); color: var(--brand-green); }
-.sidebar-btn.ayuda { color: #a97300; margin-top: 10px; border-top: 1px solid var(--divisor-sidebar); border-radius: 0; padding-top: 16px; }
-.sidebar-btn.ayuda:hover { background: #fff7e6; color: #8a6100; border-radius: var(--radius-sm); }
 
 .main-panel {
   grid-column: 4;
@@ -341,6 +362,13 @@ a.link-limpio:hover {
   margin: 0 auto;
 }
 .toolbar-celda .icono:hover { background: var(--brand-green-soft); color: var(--brand-green); transform: translateY(-1px); }
+.toolbar-celda .icono.activo { background: var(--brand-green); color: #ffffff; }
+.toolbar-celda .icono.activo:hover { background: #007a3a; color: #ffffff; }
+/* Anillo rojo para diferenciar acciones destructivas (ej: "Nuevo comunicado" borra la hoja
+   entera) del resto de los íconos — usa box-shadow en vez de border para no sumarle 4px al
+   círculo de 42px y desalinearlo del resto de la grilla. */
+.toolbar-celda .icono.icono-alerta { box-shadow: 0 0 0 2px var(--brand-red); }
+.toolbar-celda .icono.icono-alerta:hover { background: rgba(206, 43, 55, 0.08); color: var(--brand-red); }
 .toolbar-celda .icono svg { display: block; pointer-events: none; }
 .toolbar-celda .etiqueta { font-size: 11px; color: var(--text-muted); font-weight: 600; text-align: center; line-height: 1.15; }
 
@@ -492,12 +520,12 @@ a.link-limpio:hover {
 .panel-derecho-seccion .acciones { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
 .panel-derecho-seccion .btn { width: 100%; box-sizing: border-box; margin-top: 4px; }
 .btn-secundario {
-  background: #ffffff;
+  background: #f4f5f7;
   color: var(--text-main);
-  border: 1px solid var(--border-soft);
+  border: none;
   box-shadow: none;
 }
-.btn-secundario:hover { border-color: var(--brand-green); color: var(--brand-green); box-shadow: none; }
+.btn-secundario:hover { background: var(--brand-green-soft); color: var(--brand-green); box-shadow: none; }
 
 /* ---------- Modal de ayuda ---------- */
 .modal-overlay {
