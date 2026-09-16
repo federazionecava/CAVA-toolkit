@@ -445,4 +445,45 @@
       }
     }
   };
+
+  // ---------- Posiciones de salto de página (para la vista previa en pantalla) ----------
+  // Reusa exactamente el mismo cálculo de medidas que descargarComunicadoPDF (yInicial,
+  // limiteInferior, altura de página siguiente) pero sin dibujar ni paginar de verdad: solo
+  // "desenrolla" el cuerpo en una sola tira continua (misma técnica que medirAltura) y después
+  // corta esa tira en las mismas alturas de página que usaría el PDF. Así la línea que se ve en
+  // pantalla cae exactamente donde corta la hoja al descargar, sin duplicar la lógica de
+  // paginación real. Devuelve un array de posiciones en mm, medidas desde el top de #documento-a4
+  // (coincide con el sistema de coordenadas del PDF porque el diseño en pantalla y en PDF son el
+  // mismo membrete a la misma escala real).
+  window.calcularSaltosDePaginaComunicado = async function calcularSaltosDePaginaComunicado() {
+    const pdf = await crearPdfConFuente();
+
+    const cuerpoEl = document.querySelector('#documento-a4 .cuerpo');
+    const footerEl = document.querySelector('#documento-a4 .footer .footer-texto');
+    const bloquesCuerpo = domACuerpoBloques(cuerpoEl);
+    const bloquesFooter = footerABloques(footerEl);
+
+    const alturaFooter = medirAltura(pdf, bloquesFooter, CONTENT_W);
+    const reservadoInferior = BANDERA_H + alturaFooter + GAP_DIVISOR_TEXT + GAP_TEXT_BANDERA;
+    const divisorY = PAGE_H - reservadoInferior;
+    const limiteInferior = divisorY - GAP_BODY_DIVISOR;
+
+    const yInicial = dibujarEncabezado(pdf); // pdf acá es descartable, solo interesa el y que devuelve
+
+    const ctx = { x: MARGIN_L, y: yInicial, width: CONTENT_W, limiteInferior: Infinity, draw: false };
+    bloquesCuerpo.forEach((bloque, i) => {
+      layoutBloque(pdf, bloque, ctx);
+      if (i < bloquesCuerpo.length - 1) ctx.y += BLOCK_GAP;
+    });
+    const finContenido = ctx.y;
+
+    const alturaPaginaSiguiente = limiteInferior - CONTINUATION_TOP;
+    const saltos = [];
+    let y = limiteInferior;
+    while (y < finContenido) {
+      saltos.push(y);
+      y += alturaPaginaSiguiente;
+    }
+    return saltos;
+  };
 })();
