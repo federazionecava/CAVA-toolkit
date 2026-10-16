@@ -32,21 +32,22 @@
 
   <div class="app-shell" id="app-shell">
 
-    <!-- IZQUIERDA: SELECTOR DE DOCUMENTO -->
+    <!-- IZQUIERDA: SELECTOR DE DOCUMENTO (en pantallas angostas/tablet pasa a ser una barra arriba;
+         los <span class="nav-largo"> se ocultan ahí para que los botones entren en una sola fila) -->
     <div class="sidebar">
       <div class="sidebar-brand">
         <img src="img/logo.png" alt="CAVA">
         <h2 class="sidebar-brand-title">Generador <span>CAVA</span></h2>
       </div>
       <div class="sidebar-seccion-titulo">Documentos</div>
-      <button class="sidebar-btn activo" data-vista="comunicados" onclick="mostrarVista('comunicados', this)">📄 Comunicados A4</button>
-      <button class="sidebar-btn" data-vista="tarjetas" onclick="mostrarVista('tarjetas', this)">🪪 Tarjetas Personales</button>
+      <button class="sidebar-btn activo" data-vista="comunicados" onclick="mostrarVista('comunicados', this)"><span><span class="nav-icono">📄</span> Comunicados<span class="nav-largo"> A4</span></span></button>
+      <button class="sidebar-btn" data-vista="tarjetas" onclick="mostrarVista('tarjetas', this)"><span><span class="nav-icono">🪪</span> Tarjetas<span class="nav-largo"> Personales</span></span></button>
       <div class="separador"></div>
       <div class="sidebar-seccion-titulo">Marca</div>
-      <button class="sidebar-btn" data-vista="mediakit" onclick="mostrarVista('mediakit', this)">🎨 Mediakit (logos)</button>
+      <button class="sidebar-btn" data-vista="mediakit" onclick="mostrarVista('mediakit', this)"><span><span class="nav-icono">🎨</span> Mediakit<span class="nav-largo"> (logos)</span></span></button>
       <div class="separador"></div>
       <div class="sidebar-seccion-titulo">Ayuda</div>
-      <button class="sidebar-btn" onclick="abrirAyuda()">🛟 ¿Cómo funciona esto?</button>
+      <button class="sidebar-btn" onclick="abrirAyuda()"><span>🛟 <span class="nav-largo">¿Cómo funciona esto?</span><span class="nav-corto">Ayuda</span></span></button>
     </div>
 
     <!-- CENTRO: LA HOJA A4 O LA VISTA PREVIA DE TARJETAS -->
@@ -125,7 +126,6 @@
           <div class="mk-header">
             <h2>Mediakit <span>CAVA</span></h2>
             <p>Elegí una versión del logo, ajustá formato, tamaño y fondo, y descargala. La vista previa muestra exactamente el archivo que vas a bajar.</p>
-            <p class="solo-celular">Los comunicados y las tarjetas se arman desde una computadora.</p>
           </div>
 
           <h3 class="mk-seccion-titulo">Logo completo</h3>
@@ -265,38 +265,64 @@
         </div>
       </div>
 
+      <!-- Los .mk-col son "display: contents" (no existen para el layout) salvo en tablet vertical,
+           donde el panel va arriba de la galería y se reparte en 3 columnas para no ocupar tanto alto -->
       <div class="panel-derecho-seccion" id="seccion-mediakit">
-        <h3 class="panel-derecho-titulo">Vas a descargar</h3>
-        <div class="mk-preview"><img id="mk-preview-img" alt="Vista previa del archivo a descargar"></div>
-        <div class="mk-resumen">
-          <b id="mk-resumen-nombre"></b>
-          <span id="mk-resumen-detalle"></span>
+        <div class="mk-col">
+          <h3 class="panel-derecho-titulo">Vas a descargar</h3>
+          <div class="mk-preview"><img id="mk-preview-img" alt="Vista previa del archivo a descargar"></div>
+          <div class="mk-resumen">
+            <b id="mk-resumen-nombre"></b>
+            <span id="mk-resumen-detalle"></span>
+          </div>
         </div>
 
-        <div class="grupo-titulo">Formato</div>
-        <div class="mk-segmentado" id="mk-formatos"></div>
-        <p class="mk-ayuda" id="mk-ayuda-formato"></p>
+        <div class="mk-col">
+          <div class="grupo-titulo">Formato</div>
+          <div class="mk-segmentado" id="mk-formatos"></div>
+          <p class="mk-ayuda" id="mk-ayuda-formato"></p>
 
-        <div id="mk-grupo-tamano" class="mk-grupo">
-          <div class="grupo-titulo">Tamaño</div>
-          <div class="mk-segmentado" id="mk-tamanos"></div>
+          <div id="mk-grupo-tamano" class="mk-grupo">
+            <div class="grupo-titulo">Tamaño</div>
+            <div class="mk-segmentado" id="mk-tamanos"></div>
+          </div>
         </div>
 
-        <div class="grupo-titulo">Fondo</div>
-        <div class="mk-fondos" id="mk-fondos"></div>
-        <div class="grupo-titulo">Forma</div>
-        <div class="mk-segmentado" id="mk-formas">
-          <button class="mk-seg-btn" data-forma="ajustado">Ajustado</button>
-          <button class="mk-seg-btn" data-forma="cuadrado" title="Cuadrado, ideal para foto de perfil en redes">Cuadrado</button>
-        </div>
+        <div class="mk-col">
+          <div class="grupo-titulo">Fondo</div>
+          <div class="mk-fondos" id="mk-fondos"></div>
+          <div class="grupo-titulo">Forma</div>
+          <div class="mk-segmentado" id="mk-formas">
+            <button class="mk-seg-btn" data-forma="ajustado">Ajustado</button>
+            <button class="mk-seg-btn" data-forma="cuadrado" title="Cuadrado, ideal para foto de perfil en redes">Cuadrado</button>
+          </div>
 
-        <div class="acciones">
-          <button class="btn" id="mk-btn-descargar" onclick="descargarLogo()">⬇️ Descargar</button>          <button class="btn btn-secundario btn-chico" id="mk-btn-zip" onclick="descargarMediakitZIP()" title="Todas las versiones en SVG, PDF, PNG y JPG">📦 Todo el kit (ZIP)</button>
+          <div class="acciones">
+            <button class="btn" id="mk-btn-descargar" onclick="descargarLogo()">⬇️ Descargar</button>
+            <button class="btn btn-secundario btn-chico" id="mk-btn-zip" onclick="descargarMediakitZIP()" title="Todas las versiones en SVG, PDF, PNG y JPG">📦 Todo el kit (ZIP)</button>
+          </div>
         </div>
       </div>
 
     </div>
 
+  </div>
+
+  <!-- AVISO DE CELULAR: se abre al entrar desde un teléfono (salvo por /logos) y al tocar
+       Comunicados o Tarjetas, que en el celular están bloqueados (ver README, decisión #6) -->
+  <div id="modal-celular" class="modal-overlay" onclick="if (event.target === this) cerrarAvisoCelular()">
+    <div class="modal-caja aviso-celular">
+      <button class="modal-cerrar" onclick="cerrarAvisoCelular()" aria-label="Cerrar">✕</button>
+      <div class="aviso-celular-icono">💻</div>
+      <h2 class="modal-titulo" id="aviso-celular-titulo"></h2>
+      <p>En una compu o una tablet podés armar <b>comunicados</b> y <b>tarjetas personales</b> de la Federazione.</p>
+      <p>Desde el celular podés bajar el <b>logo oficial</b> en todas sus versiones.</p>
+      <div class="aviso-celular-acciones">
+        <button class="btn" onclick="cerrarAvisoCelular()">🎨 Bajar el logo</button>
+        <button class="btn btn-secundario" id="btn-mandar-link" onclick="mandarmeElLink()">📲 Mandarme el link</button>
+      </div>
+      <p class="aviso-celular-ayuda">Mandátelo por WhatsApp o mail y abrilo después en la compu.</p>
+    </div>
   </div>
 
   <!-- MODAL DE AYUDA -->
@@ -316,7 +342,7 @@
         <p class="ayuda-que">Una hoja A4 con el membrete oficial, lista para mandar en PDF.</p>
         <ol class="ayuda-pasos">
           <li><span class="paso-num">1</span><div><b>Escribí sobre la hoja</b><span>Hacé clic en el texto de ejemplo y reemplazalo por el tuyo.</span></div></li>
-          <li><span class="paso-num">2</span><div><b>Dale formato si querés</b><span>Seleccioná el texto y usá los botones de la derecha (negrita, color, listas…).</span></div></li>
+          <li><span class="paso-num">2</span><div><b>Dale formato si querés</b><span>Seleccioná el texto y usá los botones de formato (negrita, color, listas…).</span></div></li>
           <li><span class="paso-num">3</span><div><b>Descargá</b><span>Tocá <b>"Descargar PDF"</b> y listo.</span></div></li>
         </ol>
         <div class="ayuda-tip">💡 El pie con dirección, WhatsApp y mail ya viene puesto. No hace falta tocarlo.</div>
@@ -325,7 +351,7 @@
       <div class="ayuda-panel" data-ayuda="tarjetas">
         <p class="ayuda-que">Tu tarjeta personal de la Federazione, con frente y dorso.</p>
         <ol class="ayuda-pasos">
-          <li><span class="paso-num">1</span><div><b>Completá tus datos</b><span>Nombre, cargo y celular, en el panel de la derecha.</span></div></li>
+          <li><span class="paso-num">1</span><div><b>Completá tus datos</b><span>Nombre, cargo y celular, en el panel "Datos de tu tarjeta".</span></div></li>
           <li><span class="paso-num">2</span><div><b>Mirá cómo queda</b><span>La tarjeta se actualiza sola mientras escribís.</span></div></li>
           <li><span class="paso-num">3</span><div><b>Descargá</b><span><b>PDF</b> para imprimir, o <b>Imagen</b> para mandar por WhatsApp.</span></div></li>
         </ol>

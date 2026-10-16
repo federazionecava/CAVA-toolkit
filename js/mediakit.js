@@ -403,9 +403,7 @@ function actualizarMediakit() {
   document.getElementById('mk-btn-descargar').textContent = `⬇️ Descargar ${formato.nombre}`;
 }
 
-// Mismo corte que el @media del CSS. En el celular solo se ofrece el Mediakit: el comunicado A4
-// y las tarjetas no entran en una pantalla así (ver README, decisión de diseño #6).
-function esCelular() { return window.matchMedia('(max-width: 820px)').matches; }
+// esCelular() está en script.js
 
 armarGaleria();
 armarControles();
@@ -413,3 +411,10 @@ actualizarMediakit();
 // /logos abre directo el Mediakit (Vercel sirve index.html en esa ruta, ver vercel.json)
 const entroPorLogos = /\/logos\/?$/.test(location.pathname);
 if (esCelular() || entroPorLogos) mostrarVista('mediakit', document.querySelector('.sidebar-btn[data-vista="mediakit"]'));
+// Entrando desde el celular por la raíz, se explica una vez por sesión que esto es para compu/tablet.
+// Por /logos no: ya vinieron a buscar el logo, que es justo lo que se puede hacer acá.
+if (esCelular() && !entroPorLogos) {
+  let yaVisto = false;
+  try { yaVisto = sessionStorage.getItem('aviso-celular-visto') === '1'; sessionStorage.setItem('aviso-celular-visto', '1'); } catch (e) {}
+  if (!yaVisto) abrirAvisoCelular('bienvenida');
+}

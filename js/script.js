@@ -1,4 +1,12 @@
+// Mismo corte que el @media "CELULAR" del CSS (angosto, o apaisado y muy bajo). En el celular solo
+// se puede usar el Mediakit: el comunicado A4 y las tarjetas no entran en una pantalla así, así que
+// sus botones se muestran bloqueados y abren un aviso (ver README, decisión de diseño #6).
+const MEDIA_CELULAR = '(max-width: 600px), (max-width: 960px) and (max-height: 500px)';
+function esCelular() { return window.matchMedia(MEDIA_CELULAR).matches; }
+
 function mostrarVista(nombre, btn) {
+  if (nombre !== 'mediakit' && esCelular()) { abrirAvisoCelular(nombre); return; }
+
   document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
   document.getElementById('vista-' + nombre).classList.add('activa');
   document.querySelectorAll('.sidebar-btn[data-vista]').forEach(b => b.classList.remove('activo'));
@@ -18,14 +26,34 @@ function mostrarVista(nombre, btn) {
   }
 }
 
+// En tablet, tocar un botón de la toolbar (o abrir el selector de color) le saca el foco a la
+// hoja y la selección se pierde: el comando se aplicaba "a nada". Por eso se guarda el último
+// rango seleccionado DENTRO de la hoja y, si al aplicar un formato la selección ya no está ahí,
+// se restaura antes del execCommand. En compu no cambia nada (la selección sigue en la hoja).
+let ultimoRangoCuerpo = null;
+function enfocarCuerpo() {
+  const cuerpo = document.querySelector('#documento-a4 .cuerpo');
+  const sel = document.getSelection();
+  const dentro = !!(sel && sel.rangeCount && cuerpo.contains(sel.anchorNode));
+  cuerpo.focus({ preventScroll: true });
+  if (!dentro && ultimoRangoCuerpo && cuerpo.contains(ultimoRangoCuerpo.startContainer)) {
+    sel.removeAllRanges();
+    sel.addRange(ultimoRangoCuerpo);
+  }
+}
+// Que tocar/clickear un botón de formato no le robe el foco a la hoja
+document.querySelectorAll('#seccion-herramientas button.icono').forEach((btn) => {
+  btn.addEventListener('mousedown', (e) => e.preventDefault());
+});
+
 function formatoTexto(comando, valor) {
-  document.querySelector('#documento-a4 .cuerpo').focus();
+  enfocarCuerpo();
   document.execCommand(comando, false, valor || null);
   actualizarEstadoToolbar();
 }
 
 function resaltarTexto(color) {
-  document.querySelector('#documento-a4 .cuerpo').focus();
+  enfocarCuerpo();
   document.execCommand('styleWithCSS', false, true);
   const ok = document.execCommand('hiliteColor', false, color);
   if (!ok) document.execCommand('backColor', false, color);
@@ -50,6 +78,7 @@ function actualizarEstadoToolbar() {
   const cuerpo = document.querySelector('#documento-a4 .cuerpo');
   const sel = document.getSelection();
   const dentro = !!(sel && sel.anchorNode && cuerpo.contains(sel.anchorNode));
+  if (dentro && sel.rangeCount) ultimoRangoCuerpo = sel.getRangeAt(0).cloneRange();
 
   document.querySelectorAll('.icono[data-comando]').forEach((btn) => {
     const comando = btn.dataset.comando;
@@ -84,6 +113,7 @@ function nuevoComunicado() {
   if (!confirm('¿Empezar un comunicado nuevo? Se va a borrar todo el texto actual.')) return;
   const cuerpo = document.querySelector('#documento-a4 .cuerpo');
   cuerpo.innerHTML = PLANTILLA_COMUNICADO;
+  ultimoRangoCuerpo = null;
   actualizarEstadoToolbar();
   programarActualizacionSaltos();
 }
@@ -112,6 +142,39 @@ function programarActualizacionSaltos() {
 document.querySelector('#documento-a4 .cuerpo').addEventListener('input', programarActualizacionSaltos);
 programarActualizacionSaltos();
 
+// En pantallas angostas (tablet) la hoja A4 (794px) y las tarjetas no entran en el centro: se
+// achican SOLO a la vista con transform: scale, y con márgenes negativos se les descuenta el
+// espacio que dejan de ocupar (transform no cambia el lugar que algo ocupa en el layout). El
+// tamaño real en mm queda intacto, así que el PDF (que lee getComputedStyle, no medidas en
+// pantalla) y las marcas de "Fin de hoja" no se enteran. En compu la escala da 1 y no se toca nada.
+// La hoja solo se ajusta al ancho (es más alta que la pantalla y scrollea); las tarjetas también
+// al alto, porque tienen que verse enteras sin scroll (ver .centro-vertical).
+function ajustarEscalaCentro() {
+  const panel = document.querySelector('.main-panel');
+  const cs = getComputedStyle(panel);
+  const anchoDisponible = panel.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const altoDisponible = panel.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  [
+    { el: document.getElementById('documento-a4'), ajustarAlto: false },
+    { el: document.getElementById('tarjetas-preview'), ajustarAlto: true },
+  ].forEach(({ el, ajustarAlto }) => {
+    const ancho = el.offsetWidth;
+    const alto = el.offsetHeight;
+    if (!ancho) return; // vista oculta
+    let escala = Math.min(1, anchoDisponible / ancho);
+    if (ajustarAlto && altoDisponible > 0) escala = Math.min(escala, altoDisponible / alto);
+    const achicar = escala < 0.999;
+    el.style.transformOrigin = achicar ? 'top left' : '';
+    el.style.transform = achicar ? `scale(${escala})` : '';
+    el.style.marginRight = achicar ? `${-(1 - escala) * ancho}px` : '';
+    el.style.marginBottom = achicar ? `${-(1 - escala) * alto}px` : '';
+  });
+}
+// Se recalcula si cambia el ancho del centro (rotar la tablet, achicar la ventana), el alto de la
+// hoja (al escribir crece) o cuando una vista oculta se vuelve a mostrar.
+const observadorEscala = new ResizeObserver(() => requestAnimationFrame(ajustarEscalaCentro));
+['.main-panel', '#documento-a4', '#tarjetas-preview'].forEach((sel) => observadorEscala.observe(document.querySelector(sel)));
+
 // La ayuda abre directamente en la pestaña de la herramienta que se está usando
 function abrirAyuda() {
   const vistaActiva = document.querySelector('.sidebar-btn.activo[data-vista]');
@@ -122,7 +185,46 @@ function mostrarAyuda(nombre) {
   document.querySelectorAll('.ayuda-tab, .ayuda-panel').forEach((el) => el.classList.toggle('activo', el.dataset.ayuda === nombre));
 }
 function cerrarAyuda() { document.getElementById('modal-ayuda').classList.remove('activo'); }
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarAyuda(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { cerrarAyuda(); cerrarAvisoCelular(); } });
+
+// Aviso de celular: "esto se usa desde una compu o tablet; acá podés bajar el logo"
+const TITULOS_AVISO_CELULAR = {
+  bienvenida: 'Esto se usa desde una compu o una tablet',
+  comunicados: 'Los comunicados se arman desde una compu o una tablet',
+  tarjetas: 'Las tarjetas se arman desde una compu o una tablet',
+};
+function abrirAvisoCelular(motivo) {
+  document.getElementById('aviso-celular-titulo').textContent = TITULOS_AVISO_CELULAR[motivo] || TITULOS_AVISO_CELULAR.bienvenida;
+  document.getElementById('modal-celular').classList.add('activo');
+}
+function cerrarAvisoCelular() { document.getElementById('modal-celular').classList.remove('activo'); }
+
+// "Mandarme el link": el menú de compartir del teléfono (WhatsApp, mail…) si existe; si no,
+// copiar al portapapeles; y si tampoco se puede, WhatsApp directo.
+async function mandarmeElLink() {
+  const url = location.protocol.startsWith('http') ? location.origin + '/' : location.href;
+  const texto = 'Generador CAVA: comunicados, tarjetas y logos de la Federazione';
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Generador CAVA', text: texto, url }); return; }
+    catch (e) { if (e.name === 'AbortError') return; } // lo cerró el usuario
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    const btn = document.getElementById('btn-mandar-link');
+    btn.textContent = '✅ Link copiado';
+    setTimeout(() => { btn.textContent = '📲 Mandarme el link'; }, 2500);
+  } catch (e) {
+    window.open('https://wa.me/?text=' + encodeURIComponent(texto + ' ' + url), '_blank');
+  }
+}
+
+// Si la pantalla pasa a ser "de celular" (rotar, achicar la ventana) parado en Comunicados o
+// Tarjetas, se vuelve al Mediakit: esas vistas no se pueden usar ahí.
+window.matchMedia(MEDIA_CELULAR).addEventListener('change', (e) => {
+  if (e.matches && !document.getElementById('vista-mediakit').classList.contains('activa')) {
+    mostrarVista('mediakit', document.querySelector('.sidebar-btn[data-vista="mediakit"]'));
+  }
+});
 
 // descargarComunicadoPDF() vive en pdf-comunicado.js: arma el PDF a mano con texto
 // real (no rasteriza el DOM), para que salga seleccionable y con links nativos.
@@ -152,7 +254,16 @@ document.querySelectorAll('#tarjetas-preview .bandera-tarjeta img').forEach((img
 document.querySelector('#tarjetas-preview .qr').src = TARJETA_QR;
 
 async function capturarTarjetas() {
-  const opciones = { scale: 4, useCORS: true, backgroundColor: '#ffffff' };
+  const opciones = {
+    scale: 4, useCORS: true, backgroundColor: '#ffffff',
+    // En tablet la vista previa está achicada con transform (ver ajustarEscalaCentro): en la copia
+    // que captura html2canvas se le saca, así la imagen sale siempre al tamaño real.
+    onclone: (doc) => {
+      const preview = doc.getElementById('tarjetas-preview');
+      preview.style.transform = 'none';
+      preview.style.margin = '0';
+    },
+  };
   const frente = await html2canvas(document.getElementById('tarjeta-frente'), opciones);
   const dorso = await html2canvas(document.getElementById('tarjeta-dorso'), opciones);
   return { frente, dorso };

@@ -191,7 +191,7 @@ de ventana. La columna central es `auto` porque tiene que adaptarse tanto a la h
 como a la vista previa de tarjetas (mucho más angosta) sin que nadie tenga que recalcular nada.
 
 Si volvés a esto con `calc()` a mano asumiendo un ancho fijo del centro, se rompe apenas cambie
-el contenido (ya pasó dos veces).
+el contenido (ya pasó dos veces). Esto es solo en compu: en tablet el grid se redefine (ver #6).
 
 ### 5. La página en sí no scrollea — solo `.main-panel`
 
@@ -206,18 +206,42 @@ scrollee bien desde el principio) y solo se centra verticalmente cuando el JS ag
 `justify-content: center` fijo a `.main-panel` — reintroduce un bug de recorte de contenido con
 overflow.
 
-### 6. Responsive: `--panel-w` por breakpoint, "desktop first"
+### 6. Responsive: compu, tablet y celular
 
-`--panel-w` (ancho del sidebar y el panel derecho) se achica en `@media (max-width: 1400px)` y
-`@media (max-width: 1250px)`. El proyecto es explícitamente "desktop first": no está pensado para
-celular/tablet, solo para que no se rompa entre distintas resoluciones de PC/notebook.
+Hay tres layouts, todos en `css/style.css`:
 
-Única excepción: el **Mediakit sí anda en el celular** (la gente recibe el link por WhatsApp y
-quiere bajar el logo desde el teléfono). Debajo de `@media (max-width: 820px)` (mismo corte que
-`esCelular()` en `js/mediakit.js`) todo se apila con scroll normal de página, se abre directo el
-Mediakit y se ocultan Comunicados y Tarjetas (la hoja A4 no entra en un teléfono; un aviso lo
-explica). En el panel derecho del Mediakit en compu, el contenido está compactado para que entre
-sin scroll en una notebook de 1366x768: no le agregues cosas sin volver a chequear eso.
+- **Compu (> 1240px)**: las 3 columnas de la decisión #4. `--panel-w` (ancho del sidebar y el
+  panel derecho) se achica en `@media (max-width: 1400px)` y `@media (max-width: 1250px)`.
+- **Tablet / ventana angosta (601–1240px)**: las 3 columnas ya no entran (hoja de 794px + 2
+  paneles), así que el menú izquierdo pasa a ser una **barra horizontal arriba** (los textos
+  largos de los botones van en `<span class="nav-largo">` y se ocultan; "¿Cómo funciona esto?"
+  pasa a "Ayuda" con `.nav-corto`). Debajo: centro + panel derecho en 2 columnas, y si el panel
+  no entra de alto, los botones de descarga quedan `sticky` abajo. En **tablet vertical
+  (601–900px)** el panel derecho va arriba de la hoja como una cinta horizontal (herramientas en
+  fila; en Mediakit, 3 columnas con los `.mk-col`, que en los demás layouts son
+  `display: contents` y no existen para el layout).
+  - La hoja A4 y las tarjetas se **achican solo a la vista** con `transform: scale` desde
+    `ajustarEscalaCentro()` en `js/script.js` (con un `ResizeObserver`). NO se usa `zoom` ni se
+    cambian las medidas en mm: así el PDF del comunicado (que lee `getComputedStyle`) y las marcas
+    de "Fin de hoja" no se enteran. La captura de tarjetas le saca el transform a la copia que
+    toma html2canvas (`onclone` en `capturarTarjetas()`), así la imagen sale siempre a tamaño real.
+  - En táctil, tocar un botón de formato le saca la selección a la hoja: `formatoTexto()` y
+    `resaltarTexto()` restauran el último rango seleccionado dentro de la hoja
+    (`enfocarCuerpo()`), y los botones hacen `preventDefault` en `mousedown`.
+- **Celular** (`(max-width: 600px), (max-width: 960px) and (max-height: 500px)`, mismo corte que
+  `esCelular()` / `MEDIA_CELULAR` en `js/script.js`): solo se puede usar el **Mediakit** (la gente
+  recibe el link por WhatsApp y quiere bajar el logo desde el teléfono; la hoja A4 no entra en un
+  teléfono). Todo se apila con scroll normal de página y se abre directo el Mediakit. Este bloque
+  va último en el CSS y pisa al de tablet. Para que se entienda que la herramienta "es para compu":
+  - Al entrar por la raíz se abre un aviso (`#modal-celular`, `abrirAvisoCelular()`) que explica
+    que comunicados y tarjetas se arman en compu/tablet, con "Bajar el logo" y "Mandarme el link"
+    (`navigator.share` → portapapeles → WhatsApp). Una vez por sesión (`sessionStorage`). Por
+    `/logos` no aparece: ya vinieron a buscar el logo.
+  - Comunicados y Tarjetas siguen visibles en la barra, pero grises y con 💻; `mostrarVista()` no
+    los abre en celular y muestra el mismo aviso con un título según cuál se tocó.
+
+En el panel derecho del Mediakit en compu, el contenido está compactado para que entre sin scroll
+en una notebook de 1366x768: no le agregues cosas sin volver a chequear eso.
 
 ### 7. El campo Celular de la Tarjeta se formatea con una instancia nueva de `AsYouType` en cada tecleo
 
@@ -255,6 +279,11 @@ vuelve a haber esa diferencia entre pantalla y PDF.
 las tarjetas, con el único fin de que el área de trabajo (la hoja, las tarjetas) resalte por
 contraste contra el fondo de la ventana. Si algún día "corregís" esto a blanco liso porque parece
 un descuido, estás sacando ese contraste a propósito buscado.
+
+Encima de ese gris hay un tricolor italiano muy suave (verde desde la izquierda, centro neutro,
+rojo desde la derecha, con los colores de `img/bandera.svg`), para darle color sin que compita
+con la hoja. Se probaron y descartaron: luces radiales en las esquinas, una franja de bandera
+fija arriba, el león como marca de agua y un gris verdoso liso.
 
 ### 10. El Mediakit arma todas las versiones del logo en vivo, desde un solo vector
 
