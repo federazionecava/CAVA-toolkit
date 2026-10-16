@@ -7,9 +7,12 @@ dos piezas oficiales y las descargue en PDF con un clic:
 2. **Tarjetas Personales** — una tarjeta de presentación (frente + dorso con QR) con datos que
    se completan en un formulario.
 
+Además tiene un **Mediakit**: una galería con el logo oficial en varias versiones (completo o
+isotipo; color, blanco o negro) para descargar en SVG, PNG, JPG o PDF, eligiendo tamaño,
+fondo y forma (ajustado o cuadrado), o todo junto en un ZIP.
+
 No requiere instalación: se abre `index.html` directamente en el navegador (doble clic) y funciona
-tanto en `file://` como servido desde cualquier hosting estático — con una excepción conocida hoy
-(Tarjetas Personales), ver "Pendientes" al final.
+tanto en `file://` como servido desde cualquier hosting estático.
 
 ## Cómo se usa (resumen para gente, no solo para IAs)
 
@@ -36,6 +39,16 @@ js/
   imagenes-comunicado.js  → el logo y la franja de bandera del membrete, pre-rasterizados y
                             embebidos en base64, para incrustarlos en el PDF sin leerlos con
                             canvas.toDataURL() (mismo motivo que fonts-zt-nature.js, ver abajo).
+  imagenes-tarjeta.js     → el QR del dorso de la tarjeta (img/qr.png) en base64, mismo motivo.
+  logo-vectores.js        → el logo oficial vectorizado (paths SVG por capa de color: león,
+                            letras, franja celeste, franja roja, leyenda). GENERADO, no editar a
+                            mano: ver decisión de diseño #10.
+  mediakit.js             → la vista Mediakit: arma cada versión del logo y la exporta.
+
+herramientas/
+  vectorizar-logo.py → regenera js/logo-vectores.js a partir de logooficial.png (potrace).
+
+logooficial.png → el logo oficial en alta (2058x2048), fuente de la vectorización.
 
 img/         → todas las imágenes de la app:
               - logo.png, bandera.svg → arte del membrete del comunicado (logo y franja de
@@ -49,24 +62,18 @@ img/         → todas las imágenes de la app:
                 No se referencia por ruta relativa sino por URL absoluta
                 (`https://generador-cava.vercel.app/img/loading.jpg`) — ver el comentario junto a
                 esas meta tags en `index.html` si cambia el dominio de despliegue.
-              - logo_doc.svg → NO está referenciado en ningún lado del código (ni index.html, ni
-                css/, ni js/) — quedó ahí de alguna iteración anterior; antes de borrarlo,
-                confirmar con el usuario que de verdad no hace falta
 
 fonts/       → ZTNature-{Regular,Bold,SemiBold,ExtraBold}.woff2, los únicos 4 pesos que carga
               @font-face en css/style.css (tipografía única de toda la app — interfaz Y
               documento). Los .ttf de Regular/Bold/Italic/BoldItalic que vivían acá se borraron:
               no los carga nada en tiempo de ejecución (el PDF usa los que ya están embebidos en
-              base64 en js/fonts-zt-nature.js, no lee estos archivos). Si hace falta regenerar
-              ese base64 en el futuro, los .ttf originales siguen en la carpeta "ZT Nature/" de
-              la raíz.
+              base64 en js/fonts-zt-nature.js, no lee estos archivos).
 
-ZT Nature/   → paquete completo de la tipografía (formatos OT/TT/Variable/WEB OT/WEB TT, todos
-              los pesos e itálicas — ~8MB, 128 archivos). NO se sirve a la web, es material de
-              referencia/respaldo del diseñador — la app entera usa solo 4 pesos, ya copiados a
-              fonts/*.woff2. Se decidió dejarla intacta a pedido explícito del usuario aunque no
-              la use la app: es probable que sea la entrega original con licencia de la
-              fundidora, no algo trivial de recuperar si se borra por error.
+El paquete completo de la tipografía (carpeta "ZT Nature/", 128 archivos) se SACÓ del repo a
+propósito: el repo es público y no hay que redistribuir la familia completa (la Federazione tiene
+autorización para usarla, no para regalarla). Lo guarda el responsable del proyecto fuera de
+GitHub. NO volver a subirlo: si hace falta regenerar js/fonts-zt-nature.js, usar los .ttf locales
+y subir solo el resultado.
 ```
 
 No hay `package.json`, ni bundler, ni dependencias locales. Las únicas dependencias externas son
@@ -131,7 +138,7 @@ Cómo funciona ahora (todo en `pdf-comunicado.js`):
   app tiene que poder abrirse con doble clic vía `file://` (ver el README más arriba), y `fetch()`
   a archivos locales falla por CORS en Chrome bajo `file://` (esos `.ttf` fuente ya no están en
   `fonts/` — se usaron una sola vez para generar el base64 y se borraron; si hace falta
-  regenerarlo, están en `ZT Nature/ZT Nature - TT/` en la raíz). Si en algún momento se agrega un
+  regenerarlo, pedirle los `.ttf` al responsable del proyecto, ver "Estructura de archivos"). Si en algún momento se agrega un
   build/servidor y ya no hace falta soportar `file://`, se podría volver a `fetch()` + cache y
   borrar `js/fonts-zt-nature.js`, pero no lo hagas sin confirmar que `file://` dejó de ser un
   requisito.
@@ -149,11 +156,11 @@ Cómo funciona ahora (todo en `pdf-comunicado.js`):
   imagen.
 
 Las Tarjetas Personales (`descargarTarjetasPDF`/`descargarTarjetasPNG` en `js/script.js`) siguen
-usando `html2canvas` sin este tratamiento — y por eso están rotas bajo `file://` ahora mismo
-(mismo `SecurityError` de canvas tainteado, ver "Pendientes" al final). Se dejaron así a propósito
-en esta ronda porque arreglarlas no estaba pedido; el mismo enfoque de `js/imagenes-comunicado.js`
-(pre-embeber `img/logo.png`, `img/bandera.svg` y `img/qr.png` en base64 en vez de leerlos con
-`<img src>`+canvas) resolvería esto, pero falta hacerlo.
+usando `html2canvas`, pero con el mismo tratamiento: al cargar la página, `js/script.js` cambia
+el `src` de las imágenes de las tarjetas por versiones embebidas (logo y bandera de
+`js/imagenes-comunicado.js`, QR de `js/imagenes-tarjeta.js`). Antes leían `img/` directo y la
+descarga fallaba bajo `file://` con el mismo `SecurityError`. Si cambia `img/qr.png`, hay que
+regenerar `js/imagenes-tarjeta.js`.
 
 ### 2. `.documento` y `.tarjeta` tienen que quedar intactos
 
@@ -202,6 +209,13 @@ overflow.
 `@media (max-width: 1250px)`. El proyecto es explícitamente "desktop first": no está pensado para
 celular/tablet, solo para que no se rompa entre distintas resoluciones de PC/notebook.
 
+Única excepción: el **Mediakit sí anda en el celular** (la gente recibe el link por WhatsApp y
+quiere bajar el logo desde el teléfono). Debajo de `@media (max-width: 820px)` (mismo corte que
+`esCelular()` en `js/mediakit.js`) todo se apila con scroll normal de página, se abre directo el
+Mediakit y se ocultan Comunicados y Tarjetas (la hoja A4 no entra en un teléfono; un aviso lo
+explica). En el panel derecho del Mediakit en compu, el contenido está compactado para que entre
+sin scroll en una notebook de 1366x768: no le agregues cosas sin volver a chequear eso.
+
 ### 7. El campo Celular de la Tarjeta se formatea con una instancia nueva de `AsYouType` en cada tecleo
 
 El input `#tj-celular` ya NO tiene `oninput="actualizarTarjeta()"` en el HTML — ese listener se
@@ -239,17 +253,30 @@ las tarjetas, con el único fin de que el área de trabajo (la hoja, las tarjeta
 contraste contra el fondo de la ventana. Si algún día "corregís" esto a blanco liso porque parece
 un descuido, estás sacando ese contraste a propósito buscado.
 
-## Pendientes / cosas a resolver con el cliente
+### 10. El Mediakit arma todas las versiones del logo en vivo, desde un solo vector
 
-- **Bug conocido: Tarjetas Personales rota bajo `file://`.** `descargarTarjetasPDF()` y
-  `descargarTarjetasPNG()` (en `js/script.js`) tiran `SecurityError: Tainted canvases may not be
-  exported` apenas se abre `index.html` con doble clic (no en un servidor). Es el mismo problema
-  de canvas tainteado que se resolvió para el comunicado (ver decisión de diseño #1) pero nunca se
-  aplicó acá porque no estaba pedido. Se detectó probando la app de punta a punta, no es algo que
-  el cliente haya reportado todavía — avisarle. El arreglo es el mismo enfoque: pre-embeber
-  `img/logo.png`, `img/bandera.svg` y `img/qr.png` en base64 en vez de leerlos con `<img src>` +
-  canvas en el momento de exportar.
-- **`img/logo_doc.svg` no se usa en ningún lado.** No está referenciado ni en `index.html`, ni en
-  `css/style.css`, ni en ningún archivo de `js/`. Puede ser un archivo de una iteración vieja del
-  diseño que quedó dando vueltas — confirmar con el cliente si todavía hace falta antes de
-  borrarlo (no se borró por las dudas).
+No hay un archivo por versión/formato en `img/`: `js/mediakit.js` toma los paths de
+`js/logo-vectores.js` y, según lo que elija el usuario, arma el SVG como texto, rasteriza
+PNG/JPG dibujando ese SVG (como `data:` URL) en un `<canvas>`, y dibuja el PDF vectorial
+con el API de trazado de jsPDF (`moveTo`/`lineTo`/`curveTo`/`fillEvenOdd`) — por eso los paths
+solo usan comandos `M`/`L`/`C`/`Z` absolutos. El ZIP se arma con JSZip (cdnjs).
+
+- Cargar el SVG como `data:` URL (y no `img/algo.svg`) es lo que evita el canvas tainteado bajo
+  `file://` (ver decisión #1): se probó y `toDataURL()` funciona con doble clic.
+- Se usa `canvas.toDataURL()` + conversión a Blob en vez de `canvas.toBlob()`, porque `toBlob`
+  a veces nunca llama al callback (pasó en Chrome headless).
+- Cada versión define en qué fondos se ve bien (`fondos` en `TIPOS`), y el panel solo ofrece
+  esos: no se puede bajar, por ejemplo, el logo blanco sobre fondo blanco. JPG no tiene
+  transparencia, así que cae solo al primer fondo sólido de la versión.
+- La Federazione pidió que sea simple: se sacaron a propósito una sección de "colores de marca"
+  (HEX/RGB para copiar) y una versión "para fondo oscuro" (león a color + letras blancas). No las
+  vuelvas a agregar sin que lo pidan. Por el mismo motivo no hay tamaño "chico" (mínimo 2500 px,
+  también en el ZIP): la gente terminaba usando el logo pixelado. Tampoco hay WEBP: Word, imprentas
+  y varios programas no lo abren, y no le sirve al usuario de todos los días.
+- `img/logo.png` (isotipo a color de la tarjeta, el comunicado y el menú) tenía el león en un
+  naranja más claro (`#D58348`) que `logooficial.png`. Se unificó al `#D56F3C` del Mediakit
+  (también en `js/imagenes-comunicado.js`) porque rinde mejor impreso: las líneas del león son
+  muy finas y el naranja claro se lavaba en papel. Si se reemplaza `img/logo.png`, mantener ese
+  naranja.
+- Si cambia el logo: reemplazar `logooficial.png` y correr `herramientas/vectorizar-logo.py`
+  (instrucciones en el propio script); revisar el `control.svg` que genera contra el original.

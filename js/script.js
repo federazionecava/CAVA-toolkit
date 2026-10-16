@@ -5,8 +5,8 @@ function mostrarVista(nombre, btn) {
   if (btn) btn.classList.add('activo');
 
   document.querySelectorAll('.panel-derecho-seccion').forEach(s => s.classList.remove('activa'));
-  const idSeccion = nombre === 'tarjetas' ? 'seccion-tarjeta' : 'seccion-herramientas';
-  document.getElementById(idSeccion).classList.add('activa');
+  const secciones = { comunicados: 'seccion-herramientas', tarjetas: 'seccion-tarjeta', mediakit: 'seccion-mediakit' };
+  document.getElementById(secciones[nombre]).classList.add('activa');
 
   document.querySelector('.main-panel').classList.toggle('centro-vertical', nombre === 'tarjetas');
 }
@@ -105,7 +105,15 @@ function programarActualizacionSaltos() {
 document.querySelector('#documento-a4 .cuerpo').addEventListener('input', programarActualizacionSaltos);
 programarActualizacionSaltos();
 
-function abrirAyuda() { document.getElementById('modal-ayuda').classList.add('activo'); }
+// La ayuda abre directamente en la pestaña de la herramienta que se está usando
+function abrirAyuda() {
+  const vistaActiva = document.querySelector('.sidebar-btn.activo[data-vista]');
+  mostrarAyuda(vistaActiva ? vistaActiva.dataset.vista : 'comunicados');
+  document.getElementById('modal-ayuda').classList.add('activo');
+}
+function mostrarAyuda(nombre) {
+  document.querySelectorAll('.ayuda-tab, .ayuda-panel').forEach((el) => el.classList.toggle('activo', el.dataset.ayuda === nombre));
+}
 function cerrarAyuda() { document.getElementById('modal-ayuda').classList.remove('activo'); }
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarAyuda(); });
 
@@ -128,6 +136,13 @@ document.getElementById('tj-celular').addEventListener('input', (e) => {
   e.target.value = new libphonenumber.AsYouType('AR').input(e.target.value);
   actualizarTarjeta();
 });
+
+// Las imágenes de las tarjetas se cambian por sus versiones embebidas en base64 (logo y bandera de
+// imagenes-comunicado.js, QR de imagenes-tarjeta.js): si html2canvas las lee desde img/ bajo file://,
+// Chrome tainea el canvas y la descarga falla con "SecurityError: Tainted canvases".
+document.querySelectorAll('#tarjetas-preview .logo-tarjeta, #tarjetas-preview .logo-tarjeta-mini').forEach((img) => { img.src = PDF_IMAGENES.logo; });
+document.querySelectorAll('#tarjetas-preview .bandera-tarjeta img').forEach((img) => { img.src = PDF_IMAGENES.bandera; });
+document.querySelector('#tarjetas-preview .qr').src = TARJETA_QR;
 
 async function capturarTarjetas() {
   const opciones = { scale: 4, useCORS: true, backgroundColor: '#ffffff' };

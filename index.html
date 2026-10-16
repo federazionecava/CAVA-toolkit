@@ -2,8 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Generador CAVA</title>
-  <meta name="description" content="Generador de documentos de la Federazione CAVA: comunicados oficiales y tarjetas personales, listos para descargar en PDF.">
+  <meta name="description" content="Herramientas de la Federazione CAVA: comunicados oficiales, tarjetas personales y el logo oficial en todas sus versiones, listos para descargar.">
 
   <!-- Vista previa al compartir el link (WhatsApp, redes sociales), usando img/loading.jpg
        (2400x1260px). La app tiene que estar publicada en https://generador-cava.vercel.app/ para
@@ -13,14 +14,14 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://generador-cava.vercel.app/">
   <meta property="og:title" content="Generador CAVA">
-  <meta property="og:description" content="Generador de documentos de la Federazione CAVA: comunicados oficiales y tarjetas personales, listos para descargar en PDF.">
+  <meta property="og:description" content="Herramientas de la Federazione CAVA: comunicados oficiales, tarjetas personales y el logo oficial en todas sus versiones, listos para descargar.">
   <meta property="og:image" content="https://generador-cava.vercel.app/img/loading.jpg">
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="2400">
   <meta property="og:image:height" content="1260">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Generador CAVA">
-  <meta name="twitter:description" content="Generador de documentos de la Federazione CAVA: comunicados oficiales y tarjetas personales, listos para descargar en PDF.">
+  <meta name="twitter:description" content="Herramientas de la Federazione CAVA: comunicados oficiales, tarjetas personales y el logo oficial en todas sus versiones, listos para descargar.">
   <meta name="twitter:image" content="https://generador-cava.vercel.app/img/loading.jpg">
 
   <link rel="icon" type="image/png" href="img/iconoweb.png">
@@ -40,6 +41,9 @@
       <div class="sidebar-seccion-titulo">Documentos</div>
       <button class="sidebar-btn activo" data-vista="comunicados" onclick="mostrarVista('comunicados', this)">📄 Comunicados A4</button>
       <button class="sidebar-btn" data-vista="tarjetas" onclick="mostrarVista('tarjetas', this)">🪪 Tarjetas Personales</button>
+      <div class="separador"></div>
+      <div class="sidebar-seccion-titulo">Marca</div>
+      <button class="sidebar-btn" data-vista="mediakit" onclick="mostrarVista('mediakit', this)">🎨 Mediakit (logos)</button>
       <div class="separador"></div>
       <div class="sidebar-seccion-titulo">Ayuda</div>
       <button class="sidebar-btn" onclick="abrirAyuda()">🛟 ¿Cómo funciona esto?</button>
@@ -112,6 +116,25 @@
             </div>
             <div class="bandera-tarjeta"><img src="img/bandera.svg" alt=""></div>
           </div>
+        </div>
+      </div>
+
+      <!-- VISTA: MEDIAKIT (galería de versiones del logo; las opciones de descarga están en el panel derecho) -->
+      <div id="vista-mediakit" class="vista">
+        <div class="mediakit">
+          <div class="mk-header">
+            <h2>Mediakit <span>CAVA</span></h2>
+            <p>Elegí una versión del logo, ajustá formato, tamaño y fondo, y descargala. La vista previa muestra exactamente el archivo que vas a bajar.</p>
+            <p class="solo-celular">Los comunicados y las tarjetas se arman desde una computadora.</p>
+          </div>
+
+          <h3 class="mk-seccion-titulo">Logo completo</h3>
+          <p class="mk-seccion-ayuda">Con la leyenda "Comitato delle Associazioni Venete dell'Argentina". Usalo siempre que haya lugar.</p>
+          <div class="mk-galeria" id="mk-galeria-completo"></div>
+
+          <h3 class="mk-seccion-titulo">Isotipo</h3>
+          <p class="mk-seccion-ayuda">Solo el león y las letras CAVA, sin leyenda. Para espacios chicos: foto de perfil, íconos, sellos.</p>
+          <div class="mk-galeria" id="mk-galeria-isotipo"></div>
         </div>
       </div>
 
@@ -242,6 +265,36 @@
         </div>
       </div>
 
+      <div class="panel-derecho-seccion" id="seccion-mediakit">
+        <h3 class="panel-derecho-titulo">Vas a descargar</h3>
+        <div class="mk-preview"><img id="mk-preview-img" alt="Vista previa del archivo a descargar"></div>
+        <div class="mk-resumen">
+          <b id="mk-resumen-nombre"></b>
+          <span id="mk-resumen-detalle"></span>
+        </div>
+
+        <div class="grupo-titulo">Formato</div>
+        <div class="mk-segmentado" id="mk-formatos"></div>
+        <p class="mk-ayuda" id="mk-ayuda-formato"></p>
+
+        <div id="mk-grupo-tamano" class="mk-grupo">
+          <div class="grupo-titulo">Tamaño</div>
+          <div class="mk-segmentado" id="mk-tamanos"></div>
+        </div>
+
+        <div class="grupo-titulo">Fondo</div>
+        <div class="mk-fondos" id="mk-fondos"></div>
+        <div class="grupo-titulo">Forma</div>
+        <div class="mk-segmentado" id="mk-formas">
+          <button class="mk-seg-btn" data-forma="ajustado">Ajustado</button>
+          <button class="mk-seg-btn" data-forma="cuadrado" title="Cuadrado, ideal para foto de perfil en redes">Cuadrado</button>
+        </div>
+
+        <div class="acciones">
+          <button class="btn" id="mk-btn-descargar" onclick="descargarLogo()">⬇️ Descargar</button>          <button class="btn btn-secundario btn-chico" id="mk-btn-zip" onclick="descargarMediakitZIP()" title="Todas las versiones en SVG, PDF, PNG y JPG">📦 Todo el kit (ZIP)</button>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -251,25 +304,50 @@
     <div class="modal-caja">
       <button class="modal-cerrar" onclick="cerrarAyuda()" aria-label="Cerrar">✕</button>
       <h2 class="modal-titulo">🛟 ¿Cómo funciona esto?</h2>
+      <p class="ayuda-intro">Elegí qué querés hacer:</p>
 
-      <p>El <b>Generador CAVA</b> arma dos cosas oficiales de la Federazione y las descarga en PDF con un clic: <b>comunicados</b> A4 y <b>tarjetas personales</b> con QR.</p>
+      <div class="ayuda-tabs">
+        <button class="ayuda-tab" data-ayuda="comunicados" onclick="mostrarAyuda('comunicados')">📄 Comunicados</button>
+        <button class="ayuda-tab" data-ayuda="tarjetas" onclick="mostrarAyuda('tarjetas')">🪪 Tarjetas</button>
+        <button class="ayuda-tab" data-ayuda="mediakit" onclick="mostrarAyuda('mediakit')">🎨 Logos</button>
+      </div>
 
-      <h3 class="modal-subtitulo">📄 Comunicados A4</h3>
-      <ul>
-        <li>Elegí <b>"Comunicados A4"</b> y escribí tu texto sobre la hoja.</li>
-        <li>Para darle formato (negrita, color, listas, etc.) seleccioná el texto y usá los botones de la derecha.</li>
-        <li>El pie de página (dirección, WhatsApp, mail, redes) ya viene cargado y cliqueable.</li>
-        <li>Tocá <b>"Descargar PDF"</b> y listo.</li>
-      </ul>
+      <div class="ayuda-panel" data-ayuda="comunicados">
+        <p class="ayuda-que">Una hoja A4 con el membrete oficial, lista para mandar en PDF.</p>
+        <ol class="ayuda-pasos">
+          <li><span class="paso-num">1</span><div><b>Escribí sobre la hoja</b><span>Hacé clic en el texto de ejemplo y reemplazalo por el tuyo.</span></div></li>
+          <li><span class="paso-num">2</span><div><b>Dale formato si querés</b><span>Seleccioná el texto y usá los botones de la derecha (negrita, color, listas…).</span></div></li>
+          <li><span class="paso-num">3</span><div><b>Descargá</b><span>Tocá <b>"Descargar PDF"</b> y listo.</span></div></li>
+        </ol>
+        <div class="ayuda-tip">💡 El pie con dirección, WhatsApp y mail ya viene puesto. No hace falta tocarlo.</div>
+      </div>
 
-      <h3 class="modal-subtitulo">🪪 Tarjetas Personales</h3>
-      <ul>
-        <li>Elegí <b>"Tarjetas Personales"</b> y completá Nombre, Cargo y Celular a la derecha.</li>
-        <li>El logo del frente y el mail del dorso son fijos, no se editan.</li>
-        <li>Descargala en <b>PDF</b> o como <b>Imagen</b>.</li>
-      </ul>
+      <div class="ayuda-panel" data-ayuda="tarjetas">
+        <p class="ayuda-que">Tu tarjeta personal de la Federazione, con frente y dorso.</p>
+        <ol class="ayuda-pasos">
+          <li><span class="paso-num">1</span><div><b>Completá tus datos</b><span>Nombre, cargo y celular, en el panel de la derecha.</span></div></li>
+          <li><span class="paso-num">2</span><div><b>Mirá cómo queda</b><span>La tarjeta se actualiza sola mientras escribís.</span></div></li>
+          <li><span class="paso-num">3</span><div><b>Descargá</b><span><b>PDF</b> para imprimir, o <b>Imagen</b> para mandar por WhatsApp.</span></div></li>
+        </ol>
+        <div class="ayuda-tip">💡 El logo, el QR y el mail son fijos: no se pueden cambiar.</div>
+      </div>
 
-      <p>Podés volver a abrir esta ayuda cuando quieras. 🇮🇹</p>
+      <div class="ayuda-panel" data-ayuda="mediakit">
+        <p class="ayuda-que">El logo oficial, listo para bajar en la versión que necesites.</p>
+        <ol class="ayuda-pasos">
+          <li><span class="paso-num">1</span><div><b>Elegí el logo</b><span>Tocá una versión: a color, blanco o negro. El <b>isotipo</b> es el logo sin la leyenda de abajo.</span></div></li>
+          <li><span class="paso-num">2</span><div><b>Elegí el formato</b><span>Si no sabés cuál, mirá la tabla de abajo.</span></div></li>
+          <li><span class="paso-num">3</span><div><b>Descargá</b><span>La vista previa ("Vas a descargar") es <b>exactamente</b> lo que vas a bajar.</span></div></li>
+        </ol>
+
+        <div class="ayuda-formatos">
+          <div class="ayuda-formatos-titulo">¿Qué formato elijo?</div>
+          <div class="ayuda-formato"><span class="formato-chip">PNG</span><span>Para pegar sobre fotos, flyers o presentaciones (sin fondo).</span></div>
+          <div class="ayuda-formato"><span class="formato-chip">JPG</span><span>Para mandar por WhatsApp o mail.</span></div>
+          <div class="ayuda-formato"><span class="formato-chip">PDF / SVG</span><span>Para una imprenta o un diseñador.</span></div>
+        </div>
+        <div class="ayuda-tip">💡 El cuadriculado gris significa <b>"sin fondo"</b> (transparente). ¿Querés todo junto? Usá <b>"Todo el kit (ZIP)"</b>.</div>
+      </div>
     </div>
   </div>
 
@@ -278,8 +356,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/libphonenumber-js/1.13.13/libphonenumber-js.min.js"></script>
   <script src="js/fonts-zt-nature.js"></script>
   <script src="js/imagenes-comunicado.js"></script>
+  <script src="js/imagenes-tarjeta.js"></script>
   <script src="js/pdf-comunicado.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="js/script.js"></script>
+  <script src="js/logo-vectores.js"></script>
+  <script src="js/mediakit.js"></script>
 
 </body>
 </html>
