@@ -1,0 +1,6 @@
+{
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/logos", "destination": "/index.html" }
+  ]
+}

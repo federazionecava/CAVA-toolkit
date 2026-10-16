@@ -397,9 +397,9 @@ function actualizarMediakit() {
   img.src = svgADataURL(armarSVG(version, o.fondo, o.forma));
   img.className = FONDOS[o.fondo].color ? '' : ('fondo-transparente' + (version.claro ? ' oscuro' : ''));
 
-  const medida = formato.vector ? 'Vectorial (cualquier tamaño)' : (() => { const px = medidasPx(version, o.forma, o.lado); return `${px.ancho} × ${px.alto} px`; })();
+  const medida = formato.vector ? 'Cualquier tamaño' : (() => { const px = medidasPx(version, o.forma, o.lado); return `${px.ancho} × ${px.alto}`; })();
   document.getElementById('mk-resumen-nombre').textContent = `${PIEZAS[version.pieza].nombre} · ${version.etiqueta}`;
-  document.getElementById('mk-resumen-detalle').textContent = `${formato.nombre} · ${medida} · ${FONDOS[o.fondo].color ? 'Fondo ' + FONDOS[o.fondo].nombre.toLowerCase() : 'Sin fondo'}`;
+  document.getElementById('mk-resumen-detalle').textContent = `${medida} · ${FONDOS[o.fondo].color ? 'Fondo ' + FONDOS[o.fondo].nombre.toLowerCase() : 'Sin fondo'}`;
   document.getElementById('mk-btn-descargar').textContent = `⬇️ Descargar ${formato.nombre}`;
 }
 
@@ -410,4 +410,6 @@ function esCelular() { return window.matchMedia('(max-width: 820px)').matches; }
 armarGaleria();
 armarControles();
 actualizarMediakit();
-if (esCelular()) mostrarVista('mediakit', document.querySelector('.sidebar-btn[data-vista="mediakit"]'));
+// /logos abre directo el Mediakit (Vercel sirve index.html en esa ruta, ver vercel.json)
+const entroPorLogos = /\/logos\/?$/.test(location.pathname);
+if (esCelular() || entroPorLogos) mostrarVista('mediakit', document.querySelector('.sidebar-btn[data-vista="mediakit"]'));

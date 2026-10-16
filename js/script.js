@@ -9,6 +9,13 @@ function mostrarVista(nombre, btn) {
   document.getElementById(secciones[nombre]).classList.add('activa');
 
   document.querySelector('.main-panel').classList.toggle('centro-vertical', nombre === 'tarjetas');
+
+  // La barra de direcciones refleja la sección (/logos para el Mediakit, ver vercel.json), así el
+  // link que se copia lleva directo ahí. Solo servida por http(s): bajo file:// no hay rutas.
+  if (location.protocol.startsWith('http')) {
+    const ruta = nombre === 'mediakit' ? '/logos' : '/';
+    if (location.pathname !== ruta) history.replaceState(null, '', ruta + location.search);
+  }
 }
 
 function formatoTexto(comando, valor) {

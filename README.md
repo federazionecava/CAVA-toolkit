@@ -24,6 +24,9 @@ un pedido explícito de la Federazione, no un descuido.
 
 ```
 index.html   → estructura de la página (sidebar, hoja, tarjetas, panel derecho, modal)
+vercel.json  → hace que /logos sirva la misma index.html (link directo al Mediakit: el JS
+               detecta la ruta y abre esa vista; al cambiar de sección la URL pasa a /logos o /).
+               Bajo file:// no hay rutas, así que con doble clic se abre siempre en Comunicados.
 
 css/
   style.css  → todo el CSS
